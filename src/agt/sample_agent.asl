@@ -2,6 +2,8 @@
 
 /* Initial beliefs and rules */
 
+rl_observe(g,o).
+
 /* Initial goals */
 
 !start.

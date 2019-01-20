@@ -14,9 +14,9 @@
 
 mas jacamoRL {
 
-    agent sample_agent
-
-    
+    agent rlagent : sample_agent.asl {
+    	ag-bb-class: rl.beliefbase.BeliefBaseRL	
+    }
 
 }
 
