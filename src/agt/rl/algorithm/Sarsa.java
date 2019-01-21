@@ -19,8 +19,7 @@ public class Sarsa implements AlgorithmRL{
 		
 		String selectedActionString = null;
 		for(Action a : action) {
-			selectedActionString = a.getName() + "(";
-			selectedActionString += ")";
+			selectedActionString = a.getName();
 		}
 		
 		return selectedActionString;

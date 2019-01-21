@@ -20,7 +20,7 @@ rl_terminal(mygoal) :- myobs(myprop).
 +!start : true <- .print("hello world."); rl.execute(mygoal).
 
 @exe[rl_goal(mygoal)]
-+!execrl : true <- .print("RL executed!").
++!myplan : true <- .print("RL executed!").
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
