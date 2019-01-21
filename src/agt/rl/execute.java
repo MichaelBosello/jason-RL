@@ -10,10 +10,12 @@ import jason.asSemantics.IntendedMeans;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Term;
 import rl.algorithm.AlgorithmRL;
@@ -58,6 +60,7 @@ public class execute extends DefaultInternalAction {
 			
 			List<Plan> plans = ts.getAg().getPL().getPlans();
 			for(Plan plan : plans) {
+				if(plan.getAnnot(GOAL_FUNCTOR) != null)
 				for(Term annotationGoal : plan.getAnnot(GOAL_FUNCTOR).getTerms()) {
 					if(annotationGoal.toString().equals(goal)) {
 						if(plan.getContext().logicalConsequence(ts.getAg(), un).hasNext()) {
@@ -92,13 +95,25 @@ public class execute extends DefaultInternalAction {
 				}
 			}
 			
-			PlanBody rlResult = new PlanBodyImpl();
+			System.out.println(parameter.toString() + " " + action.toString() + " " +
+					observation.toString() + " " + reward + " " + isTerminal);
 			
+			String rlResult = rl.nextAction(parameter, action, observation, reward, isTerminal);
+			
+			PlanBody rlPlanBody = new PlanBodyImpl();
+			if(rlResult != null) {
+				rlPlanBody.add(new PlanBodyImpl(BodyType.achieve, ASSyntax.parseTerm(rlResult)));
+			}
+			if(!isTerminal) {
+				String redoIA = "rl.execute(" + goal + ")";
+				rlPlanBody.add(new PlanBodyImpl(BodyType.internalAction, ASSyntax.parseTerm(redoIA)));
+			}
 			
 			Intention currentIntention = ts.getC().getSelectedIntention();
 			IntendedMeans currentMeans = currentIntention.pop();
-			currentMeans.insertAsNextStep(rlResult);
+			currentMeans.insertAsNextStep(rlPlanBody);
 			currentIntention.push(currentMeans);
+			return true;
 		}
 		
 		return false;

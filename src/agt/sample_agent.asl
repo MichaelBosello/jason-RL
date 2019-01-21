@@ -1,10 +1,11 @@
 // Agent sample_agent in project jacamoRL
 
 /* Initial beliefs and rules */
+myobs(myprop).
+
+rl_parameter(myparam, myvalue).
 
 rl_observe(mygoal, myobs).
-
-myobs(myprop).
 
 rl_reward(mygoal, 10) :- myobs(myprop).
 
@@ -16,7 +17,10 @@ rl_terminal(mygoal) :- myobs(myprop).
 
 /* Plans */
 
-+!start : true <- .print("hello world.").
++!start : true <- .print("hello world."); rl.execute(mygoal).
+
+@exe[rl_goal(mygoal)]
++!execrl : true <- .print("RL executed!").
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

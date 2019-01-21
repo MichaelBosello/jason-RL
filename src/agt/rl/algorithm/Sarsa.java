@@ -16,8 +16,14 @@ public class Sarsa implements AlgorithmRL{
 			Set<Literal> observation,
 			double reward,
 			boolean isTerminal) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String selectedActionString = null;
+		for(Action a : action) {
+			selectedActionString = a.getName() + "(";
+			selectedActionString += ")";
+		}
+		
+		return selectedActionString;
 	}
 
 }
