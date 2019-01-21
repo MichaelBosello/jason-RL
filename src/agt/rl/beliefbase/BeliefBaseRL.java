@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import jason.NoValueException;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Literal;
@@ -22,6 +23,9 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 	
 	public static final String PARAMETER_FUNCTOR = "rl_parameter";
 	public static final String OBSERVE_FUNCTOR = "rl_observe";
+	
+	public static final PredicateIndicator TERMINAL_INDICATOR = new PredicateIndicator("rl_terminal", 1);
+	public static final PredicateIndicator REWARD_INDICATOR = new PredicateIndicator("rl_reward", 2);
 	
 	Agent agentRef;
 	
@@ -121,10 +125,9 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 		return parameter;
 	}
 	
-	PredicateIndicator rewardIndicator = new PredicateIndicator("rl_reward", 2);
 	public double getCurrentReward(String goal) {
 		double totalReward = 0;
-		Iterator<Literal> reward = this.getCandidateBeliefs(rewardIndicator);
+		Iterator<Literal> reward = this.getCandidateBeliefs(REWARD_INDICATOR);
 		
 		while (reward.hasNext()) {
             Literal rw = reward.next();
@@ -156,16 +159,19 @@ public class BeliefBaseRL extends DefaultBeliefBase {
     					rewardValue = ruleReward.toString();
     				}
     				
+    				Unifier unifierGoal = new Unifier();
+    				
     				VarTerm goalVar = null;
     				VarTerm rewardVar = null;
     				if(ruleGoal.isVar()) {
     					goalVar = (VarTerm) ruleGoal;
+    					unifierGoal.bind(goalVar, ASSyntax.createAtom(goal));
 		            }
 					if(ruleReward.isVar()) {
 						rewardVar = (VarTerm) ruleReward;
 					}
     				
-    				Iterator<Unifier> candidateReward = rewardRule.getBody().logicalConsequence(agentRef, new Unifier());
+    				Iterator<Unifier> candidateReward = rewardRule.getBody().logicalConsequence(agentRef, unifierGoal);
     				
     				if(candidateReward != null)
     				if(goalValue != null && rewardValue != null && candidateReward.hasNext()) {
@@ -209,9 +215,8 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 		return totalReward;
 	}
 	
-	PredicateIndicator terminalIndicator = new PredicateIndicator("rl_terminal", 1);
 	public boolean isCurrentStateTerminal(String goal) {
-		Iterator<Literal> terminalCandidate = this.getCandidateBeliefs(terminalIndicator);
+		Iterator<Literal> terminalCandidate = this.getCandidateBeliefs(TERMINAL_INDICATOR);
 		if(terminalCandidate != null)
 		while (terminalCandidate.hasNext()) {
             Literal terminal = terminalCandidate.next();
@@ -224,19 +229,17 @@ public class BeliefBaseRL extends DefaultBeliefBase {
             } else {
             	Rule terminalRule = (Rule) terminal;
 				Term headGoal = terminalRule.getHead().getTerm(0);
+				
+				Unifier unifierGoal = new Unifier();
+				if(headGoal.isVar()) {
+					VarTerm goalVar = (VarTerm) headGoal;
+					unifierGoal.bind(goalVar, ASSyntax.createAtom(goal));
+	            }
 
-				Iterator<Unifier> terminalRuleUnifier = terminalRule.getBody().logicalConsequence(agentRef, new Unifier());
-				if(headGoal.isGround() && terminalRuleUnifier.hasNext() && headGoal.toString().equals(goal)) {
-					return true;
-				}
-				while (terminalRuleUnifier.hasNext()) {
-		            Unifier u = terminalRuleUnifier.next();
-		            if(headGoal.isVar()) {
-		            	Term t = u.get(headGoal.toString());
-		            	if(t.isGround() && t.toString().equals(goal)) {
-		            		return true;
-		            	}
-		            }
+				Iterator<Unifier> terminalRuleUnifier = terminalRule.getBody().logicalConsequence(agentRef, unifierGoal);
+				if(terminalRuleUnifier.hasNext()) {
+					if(headGoal.isVar() || (headGoal.isGround() && headGoal.toString().equals(goal)))
+						return true;
 				}
             }
 		}
