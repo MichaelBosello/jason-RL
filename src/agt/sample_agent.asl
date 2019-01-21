@@ -2,7 +2,13 @@
 
 /* Initial beliefs and rules */
 
-rl_observe(g,o).
+rl_observe(mygoal, myobs).
+
+myobs(myprop).
+
+rl_reward(mygoal, 10) :- myobs(myprop).
+
+rl_terminal(mygoal) :- myobs(myprop).
 
 /* Initial goals */
 
