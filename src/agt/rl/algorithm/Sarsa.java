@@ -6,20 +6,31 @@ import java.util.Set;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import rl.component.Action;
+import rl.component.Action.ParameterType;
+import rl.component.ActionParameter;
 
 public class Sarsa implements AlgorithmRL{
 
 	@Override
-	public String nextAction(
+	public Action nextAction(
 			Map<Term, Term> parameter,
 			Set<Action> action,
 			Set<Literal> observation,
 			double reward,
 			boolean isTerminal) {
 		
-		String selectedActionString = null;
+		Action selectedActionString = null;
 		for(Action a : action) {
-			selectedActionString = a.getName();
+			selectedActionString = a;
+			for(ActionParameter param : a.getParameters()) {
+				if(param.getType().equals(ParameterType.SET)) {
+					
+				} else if(param.getType().equals(ParameterType.INT)) {
+					
+				} else if(param.getType().equals(ParameterType.REAL)) {
+					
+				}
+			}
 		}
 		
 		return selectedActionString;

@@ -100,11 +100,11 @@ public class execute extends DefaultInternalAction {
 		
 		
 
-		String rlResult = rl.nextAction(parameter, action, observation, reward, isTerminal);
+		Action rlResult = rl.nextAction(parameter, action, observation, reward, isTerminal);
 
 		PlanBody rlPlanBody = new PlanBodyImpl();
 		if(rlResult != null) {
-			rlPlanBody.add(new PlanBodyImpl(BodyType.achieve, ASSyntax.parseTerm(rlResult)));
+			//rlPlanBody.add(new PlanBodyImpl(BodyType.achieve, ASSyntax.parseTerm(rlResult)));
 		}
 		if(!isTerminal) {
 			String redoIA = "rl.execute(" + goal + ")";

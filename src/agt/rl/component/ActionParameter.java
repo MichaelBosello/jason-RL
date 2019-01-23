@@ -9,6 +9,7 @@ public class ActionParameter {
 	String name;
 	double min, max;
 	Set<String> set;
+	Object value;
 	
 	public ActionParameter(String name, int min, int max){
 		type = ParameterType.INT;
@@ -28,5 +29,11 @@ public class ActionParameter {
 	public double getMin() { return min; }
 	public double getMax() { return max; }
 	public Set<String> getSet() { return set; }
+	public ParameterType getType() { return type; }
+	
+	public Object getValue() { return value; }
+	public void setValue(Object value) {
+		this.value = value;
+	}
 	
 }

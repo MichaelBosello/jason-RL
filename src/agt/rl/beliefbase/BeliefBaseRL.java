@@ -176,7 +176,16 @@ public class BeliefBaseRL extends DefaultBeliefBase {
     				if(candidateReward != null)
     				if(goalValue != null && rewardValue != null && candidateReward.hasNext()) {
     					if(goalValue.equals(goal)) {
-    						totalReward += Integer.parseInt(rewardValue);
+    						try {
+    							totalReward += Integer.parseInt(rewardValue);
+    						} catch(Exception e) {
+    							if(rewardValue.length() > 2) {
+    								rewardValue = rewardValue.substring(1, rewardValue.length() - 1);
+    								try {
+    	    							totalReward += Integer.parseInt(rewardValue);
+    	    						} catch(Exception e2) {}
+    							}
+    						}
     					}
     				} else {
     					if(candidateReward != null)

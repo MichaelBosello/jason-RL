@@ -8,7 +8,7 @@ import jason.asSyntax.Term;
 import rl.component.Action;
 
 public interface AlgorithmRL {
-	public String nextAction(
+	public Action nextAction(
 			Map<Term, Term> parameter,
 			Set<Action> action,
 			Set<Literal> observation,
