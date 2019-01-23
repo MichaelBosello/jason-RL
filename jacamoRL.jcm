@@ -16,6 +16,15 @@ mas jacamoRL {
 
     agent rlagent : sample_agent.asl {
     	ag-bb-class: rl.beliefbase.BeliefBaseRL	
+    	focus: gridworld.grid
+    	verbose: 0
+    }
+    
+    workspace gridworld {
+        // each agent has its own artifact to interface with the Mining Planet scenario
+        // first parameter is the id of the scenario
+        // second parameter is the id of the agent in the scenario
+        artifact grid: gridworld.GridWorldEnv()
     }
 
 }

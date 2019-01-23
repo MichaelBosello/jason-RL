@@ -1,15 +1,14 @@
 // Agent sample_agent in project jacamoRL
 
 /* Initial beliefs and rules */
-myobs(myprop).
-
 rl_parameter(myparam, myvalue).
 
-rl_observe(mygoal, myobs).
+rl_observe(reach_finish, pos).
 
-rl_reward(mygoal, 10) :- myobs(myprop).
+rl_reward(reach_finish, 10) :- finishline.
+rl_reward(reach_finish, -1) :- not finishline.
 
-rl_terminal(mygoal) :- myobs(myprop).
+rl_terminal(reach_finish) :- finishline.
 
 /* Initial goals */
 
@@ -17,10 +16,10 @@ rl_terminal(mygoal) :- myobs(myprop).
 
 /* Plans */
 
-+!start : true <- .print("hello world."); rl.execute(mygoal).
++!start : true <- rl.execute(mygoal).
 
-@exe[rl_goal(mygoal)]
-+!myplan : true <- .print("RL executed!").
+@exe[rl_goal(reach_finish), rl_param(direction(set(right, left, up, down)))]
++!move(DIRECTION) : true <- move(DIRECTION).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
