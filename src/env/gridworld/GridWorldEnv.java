@@ -34,7 +34,7 @@ public class GridWorldEnv extends Artifact{
     public void move(String move) {
     	
         try {
-            Thread.sleep(200);
+            Thread.sleep(400);
         } catch (Exception e) {}
     	
         log("Move " + move);
@@ -102,16 +102,19 @@ public class GridWorldEnv extends Artifact{
         }
         void left() throws Exception {
             Location r1 = getAgPos(0);
+            if(r1.x > 0)
             r1.x--;
             setAgPos(0, r1);
         }
         void up() throws Exception {
             Location r1 = getAgPos(0);
+            if(r1.y < GRID_SIZE - 1)
             r1.y++;
             setAgPos(0, r1);
         }
         void down() throws Exception {
             Location r1 = getAgPos(0);
+            if(r1.y > 0)
             r1.y--;
             setAgPos(0, r1);
         }

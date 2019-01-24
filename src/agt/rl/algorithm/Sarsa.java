@@ -19,21 +19,21 @@ public class Sarsa implements AlgorithmRL{
 			double reward,
 			boolean isTerminal) {
 		
-		Action selectedActionString = null;
+		Action selectedAction = null;
 		for(Action a : action) {
-			selectedActionString = a;
+			selectedAction = a;
 			for(ActionParameter param : a.getParameters()) {
 				if(param.getType().equals(ParameterType.SET)) {
-					
+					param.setValue(param.getSet().toArray()[0].toString());
 				} else if(param.getType().equals(ParameterType.INT)) {
-					
+					param.setValue(String.valueOf(param.getMin()));
 				} else if(param.getType().equals(ParameterType.REAL)) {
-					
+					param.setValue(String.valueOf(param.getMin()));
 				}
 			}
 		}
 		
-		return selectedActionString;
+		return selectedAction;
 	}
 
 }

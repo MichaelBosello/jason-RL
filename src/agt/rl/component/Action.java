@@ -21,7 +21,7 @@ public class Action {
 		this.parameters = null;
 	}
 	
-	public String getName() { return name; }
+	public String getLiteralString() { return name; }
 	public Set<ActionParameter> getParameters() { return parameters; }
 
 }

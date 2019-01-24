@@ -19,7 +19,7 @@ rl_terminal(reach_finish) :- finishline.
 +!start : true <- rl.execute(reach_finish).
 
 @exe[rl_goal(reach_finish), rl_param(direction(set(right, left, up, down)))]
-+!move(DIRECTION) : true <- move(DIRECTION).
++!move(Direction) : true <- move(Direction).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

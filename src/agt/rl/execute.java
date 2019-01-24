@@ -27,7 +27,7 @@ import rl.component.ActionParameter;
 public class execute extends DefaultInternalAction {
 
 	public static final String GOAL_FUNCTOR = "rl_goal";
-	public static final String ACTION_PARAM_FUNCTOR = "rl_action_param";
+	public static final String ACTION_PARAM_FUNCTOR = "rl_param";
 	public static final String PARAM_SET_FUNCTOR = "set";
 	public static final String PARAM_REAL_FUNCTOR = "real";
 	public static final String PARAM_INT_FUNCTOR = "int";
@@ -101,10 +101,17 @@ public class execute extends DefaultInternalAction {
 		
 
 		Action rlResult = rl.nextAction(parameter, action, observation, reward, isTerminal);
+		String actionString = rlResult.getLiteralString();
+		for(ActionParameter actionParameter : rlResult.getParameters()) {
+			String parameterName = actionParameter.getName();
+			String variable = parameterName.substring(0, 1).toUpperCase();
+			variable +=  parameterName.substring(1, parameterName.length());
+			actionString = actionString.replace(variable, actionParameter.getValue());
+		}
 
 		PlanBody rlPlanBody = new PlanBodyImpl();
 		if(rlResult != null) {
-			//rlPlanBody.add(new PlanBodyImpl(BodyType.achieve, ASSyntax.parseTerm(rlResult)));
+			rlPlanBody.add(new PlanBodyImpl(BodyType.achieve, ASSyntax.parseTerm(actionString)));
 		}
 		if(!isTerminal) {
 			String redoIA = "rl.execute(" + goal + ")";
