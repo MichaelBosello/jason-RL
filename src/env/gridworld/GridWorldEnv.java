@@ -37,7 +37,6 @@ public class GridWorldEnv extends Artifact{
             Thread.sleep(40);
         } catch (Exception e) {}
     	
-        log("Move " + move);
         try {
             if (move.equals("right")) {
                 model.right();

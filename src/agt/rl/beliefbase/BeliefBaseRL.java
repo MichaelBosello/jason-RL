@@ -47,7 +47,7 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 	public boolean remove(Literal l) {
 		for( Set<Literal> observed: currentObservation.values()) {
 			observed.remove(l);
-			System.out.println("removed " + l.toString());
+			//System.out.println("removed " + l.toString());
 		}
 		//TODO remove also for observation and parameter
 		return super.remove(l);
@@ -98,13 +98,13 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 		} else {
 			trackAll.forEach( goal -> {
 				putMapSet(currentObservation, goal, belief);
-				System.out.println("Add to current observation " + belief.toString() + " for goal " + goal.toString());
+				//System.out.println("Add to current observation " + belief.toString() + " for goal " + goal.toString());
 			});
 
 			if(observationGoal.containsKey(functor)) {
 				observationGoal.get(functor).forEach( goal -> {
 					putMapSet(currentObservation, goal, belief);
-					System.out.println("Add to current observation " + belief.toString() + " for goal " + goal.toString());
+					//System.out.println("Add to current observation " + belief.toString() + " for goal " + goal.toString());
 				});
 			}
 		} 
