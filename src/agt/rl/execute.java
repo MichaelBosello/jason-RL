@@ -120,6 +120,7 @@ public class execute extends DefaultInternalAction {
 
 		Intention currentIntention = ts.getC().getSelectedIntention();
 		IntendedMeans currentMeans = currentIntention.pop();
+		rlPlanBody.add(currentMeans.getCurrentStep());
 		currentMeans.insertAsNextStep(rlPlanBody);
 		currentIntention.push(currentMeans);
 		return true;

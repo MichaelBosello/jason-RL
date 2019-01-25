@@ -15,7 +15,7 @@ import cartago.ObsProperty;
 
 public class GridWorldEnv extends Artifact{
 
-    public static final int GRID_SIZE = 7;
+    public static final int GRID_SIZE = 5;
     public static final int FINISH_LINE  = 16; // finsh line code in grid model
 
     private GridModel model;
@@ -34,7 +34,7 @@ public class GridWorldEnv extends Artifact{
     public void move(String move) {
     	
         try {
-            Thread.sleep(400);
+            Thread.sleep(40);
         } catch (Exception e) {}
     	
         log("Move " + move);
@@ -108,14 +108,14 @@ public class GridWorldEnv extends Artifact{
         }
         void up() throws Exception {
             Location r1 = getAgPos(0);
-            if(r1.y < GRID_SIZE - 1)
-            r1.y++;
+            if(r1.y > 0)
+                r1.y--;
             setAgPos(0, r1);
         }
         void down() throws Exception {
             Location r1 = getAgPos(0);
-            if(r1.y > 0)
-            r1.y--;
+            if(r1.y < GRID_SIZE - 1)
+                r1.y++;
             setAgPos(0, r1);
         }
         void reset() {

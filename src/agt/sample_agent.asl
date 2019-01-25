@@ -5,8 +5,8 @@ rl_parameter(myparam, myvalue).
 
 rl_observe(reach_finish, pos).
 
-rl_reward(reach_finish, 10) :- finishline.
-rl_reward(reach_finish, -1) :- not finishline.
+rl_reward(reach_finish, 100) :- finishline.
+rl_reward(reach_finish, -10) :- not finishline.
 
 rl_terminal(reach_finish) :- finishline.
 
@@ -16,7 +16,7 @@ rl_terminal(reach_finish) :- finishline.
 
 /* Plans */
 
-+!start : true <- rl.execute(reach_finish).
++!start : true <- rl.execute(reach_finish); !start.
 
 @exe[rl_goal(reach_finish), rl_param(direction(set(right, left, up, down)))]
 +!move(Direction) : true <- move(Direction).
