@@ -1,11 +1,15 @@
 package rl.component;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import rl.component.Action.ParameterType;
 
-public class ActionParameter {
+public class ActionParameter implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	
 	ParameterType type;
 	String name;
 	double min, max;

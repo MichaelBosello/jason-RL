@@ -103,6 +103,7 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 
 			if(observationGoal.containsKey(functor)) {
 				observationGoal.get(functor).forEach( goal -> {
+					belief.clearAnnots();
 					putMapSet(currentObservation, goal, belief);
 					//System.out.println("Add to current observation " + belief.toString() + " for goal " + goal.toString());
 				});
