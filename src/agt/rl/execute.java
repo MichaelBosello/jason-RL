@@ -34,8 +34,6 @@ public class execute extends DefaultInternalAction {
 
 	private static final long serialVersionUID = 1L;
 
-	AlgorithmRL rl = new Sarsa();
-
 	@Override
 	public Object execute(TransitionSystem ts, final Unifier un, final Term[] arg) throws Exception {
 		BeliefBaseRL rlbb = (BeliefBaseRL) ts.getAg().getBB();
@@ -51,7 +49,7 @@ public class execute extends DefaultInternalAction {
 		if(goal == null) {
 			return false;
 		}
-
+		
 		Map<Term, Term> parameter = rlbb.getRlParameter();
 		Set<Literal> observation = rlbb.getCurrentObservation(goal);
 		double reward = rlbb.getCurrentReward(goal);
@@ -99,8 +97,9 @@ public class execute extends DefaultInternalAction {
 
 		
 		
-
-		Action rlResult = rl.nextAction(parameter, action, observation, reward, isTerminal);
+		
+		Action rlResult = rlbb.getRLInstance()
+				.nextAction(parameter, action, observation, reward, isTerminal);
 		String actionString = rlResult.getLiteralString();
 		for(ActionParameter actionParameter : rlResult.getParameters()) {
 			String parameterName = actionParameter.getName();

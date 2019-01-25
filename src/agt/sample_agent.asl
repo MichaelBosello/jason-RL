@@ -3,12 +3,12 @@
 /* Initial beliefs and rules */
 rl_parameter(policy, egreedy).
 rl_parameter(alpha, 0.6).
-rl_parameter(gamma, 0.6).
-rl_parameter(epsilon, 0.5).
+rl_parameter(gamma, 0.9).
+rl_parameter(epsilon, 0.3).
 
 rl_observe(reach_finish, pos).
 
-rl_reward(reach_finish, 10) :- finishline.
+rl_reward(reach_finish, 100) :- finishline.
 rl_reward(reach_finish, -1) :- not finishline.
 
 rl_terminal(reach_finish) :- finishline.

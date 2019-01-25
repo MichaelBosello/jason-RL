@@ -41,7 +41,8 @@ public class Sarsa implements AlgorithmRL{
 	private FileOutputStream outFile;
 	private int episode = 1;
 	private int episodeForSaving = 1;
-	private int writeEveryNEpisode = 30;
+	private int writeEveryNEpisode = 400;
+	
 	private boolean saveProgress = true;
 	private boolean loadProgress = true;
 	
@@ -118,7 +119,7 @@ public class Sarsa implements AlgorithmRL{
 		System.out.println("reward " + reward);
 		System.out.println("State " + state);
 		System.out.println("Actions " + actions.toString());
-		//System.out.println("q " + q.toString());
+		System.out.println("q " + q.toString());
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		
 		

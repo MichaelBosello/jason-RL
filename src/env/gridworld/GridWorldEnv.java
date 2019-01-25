@@ -44,7 +44,7 @@ public class GridWorldEnv extends Artifact {
 
 		try {
 			if (SHOW_VIEW) {
-				Thread.sleep(100);
+				Thread.sleep(200);
 			}
 		} catch (Exception e) {
 		}
