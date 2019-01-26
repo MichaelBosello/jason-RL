@@ -43,8 +43,8 @@ public class Sarsa implements AlgorithmRL{
 	private int episodeForSaving = 1;
 	private int writeEveryNEpisode = 400;
 	
-	private boolean saveProgress = true;
-	private boolean loadProgress = true;
+	private boolean saveProgress = false;
+	private boolean loadProgress = false;
 	
 	private double alpha = 0.5;
 	private double gamma = 0.5;
@@ -93,6 +93,21 @@ public class Sarsa implements AlgorithmRL{
 			q = new HashMap<>();
 		}
 	}
+	
+	@Override
+	public double expectedReturn(Set<Action> action, Set<Literal> observation) {
+		String state = observationToState(observation);
+		Map<Action, Double> valueFunctionState = q.get(state);
+		if(valueFunctionState != null) {
+			List<Action> actions = discretizeAction(action);
+			Action selectedAction = selectAction(state, actions);
+			if(valueFunctionState.containsKey(selectedAction)) {
+				double expecterReward = valueFunctionState.get(selectedAction);
+				return expecterReward;
+			}
+		}
+		return initialActionValue;
+	}
 
 	@Override
 	public Action nextAction(
@@ -112,7 +127,7 @@ public class Sarsa implements AlgorithmRL{
 		List<Action> actions = discretizeAction(action);
 		addNewActionToQ(state, actions);
 		
-		
+		/*
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		System.out.println("alpha " + alpha + " gamma " + gamma +
 				" epsilon " + epsilon + " policy " + policy);
@@ -121,7 +136,7 @@ public class Sarsa implements AlgorithmRL{
 		System.out.println("Actions " + actions.toString());
 		System.out.println("q " + q.toString());
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		
+		*/
 		
 		Action selectedAction = selectAction(state, actions);
 		

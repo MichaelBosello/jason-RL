@@ -8,10 +8,12 @@ import jason.asSyntax.Term;
 import rl.component.Action;
 
 public interface AlgorithmRL {
-	public Action nextAction(
+	Action nextAction(
 			Map<Term, Term> parameter,
 			Set<Action> action,
 			Set<Literal> observation,
 			double reward,
 			boolean isTerminal);
+	
+	double expectedReturn(Set<Action> action, Set<Literal> observation);
 }
