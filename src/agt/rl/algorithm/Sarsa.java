@@ -26,6 +26,8 @@ public class Sarsa implements AlgorithmRL{
 	private static final String ALPHA_TERM = "alpha";
 	private static final String GAMMA_TERM = "gamma";
 	private static final String EPSILON_TERM = "epsilon";
+	private static final String EPSILON_DECAY_TERM = "epsilon_decay";
+	private static final String EPSILON_MIN_TERM = "epsilon_min";
 	private static final String POLICY_TERM = "policy";
 	private static final String ONLY_EXPLOIT_POLICY = "exploit_only";
 	private static final String EGREEDY_POLICY = "egreedy";
@@ -49,7 +51,10 @@ public class Sarsa implements AlgorithmRL{
 	private double alpha = 0.5;
 	private double gamma = 0.5;
 	private double epsilon = 0.1;
-	private double initialActionValue = 0.5;
+	private double currentEpsilon = 0;
+	private double epsilonDecay = 1;
+	private double epsilonMin = 0;
+	private double initialActionValue = 0;
 	private String policy = EGREEDY_POLICY;
 	private boolean dynamicEpsilon = true;
 	
@@ -119,9 +124,14 @@ public class Sarsa implements AlgorithmRL{
 		
 		updateParameters(parameter);
 		
-		if(dynamicEpsilon) {
-			epsilon = 1/episode;
+		if(currentEpsilon == 0) {
+			currentEpsilon = epsilon;
 		}
+		currentEpsilon = currentEpsilon * epsilonDecay;
+		if(currentEpsilon < epsilonMin) {
+			currentEpsilon = epsilonMin;
+		}
+		
 		
 		String state = observationToState(observation);
 		List<Action> actions = discretizeAction(action);
@@ -130,7 +140,7 @@ public class Sarsa implements AlgorithmRL{
 		/*
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		System.out.println("alpha " + alpha + " gamma " + gamma +
-				" epsilon " + epsilon + " policy " + policy);
+				" epsilon " + currentEpsilon + " policy " + policy);
 		System.out.println("reward " + reward);
 		System.out.println("State " + state);
 		System.out.println("Actions " + actions.toString());
@@ -150,10 +160,13 @@ public class Sarsa implements AlgorithmRL{
 		previousState = state;
 		previousAction = selectedAction;
 
-		if(isTerminal) {
+		if(isTerminal) {System.out.println(currentEpsilon);
 			previousState = null;
 			previousAction = null;
 			episode++;
+			if(dynamicEpsilon) {
+				currentEpsilon = (double) 1/episode;
+			}
 			episodeForSaving++;
 			if(saveProgress && episodeForSaving >= writeEveryNEpisode) {
 				episodeForSaving = 0;
@@ -173,7 +186,7 @@ public class Sarsa implements AlgorithmRL{
 	}
 	
 	private Action selectAction(String state, List<Action> actions) {
-		if(policy.equals(EGREEDY_POLICY) && randomEGreedy.nextDouble() < epsilon) {
+		if(policy.equals(EGREEDY_POLICY) && randomEGreedy.nextDouble() < currentEpsilon) {
 			int randomSelected = randomEGreedy.nextInt(actions.size());
 			return actions.get(randomSelected);
 		}
@@ -234,6 +247,10 @@ public class Sarsa implements AlgorithmRL{
 						} else if(parameterKey.equals(EPSILON_TERM)) {
 							epsilon = value;
 							dynamicEpsilon = false;
+						} else if(parameterKey.equals(EPSILON_DECAY_TERM)) {
+							epsilonDecay = value;
+						} else if(parameterKey.equals(EPSILON_MIN_TERM)) {
+							epsilonMin = value;
 						}
 					}
 				}

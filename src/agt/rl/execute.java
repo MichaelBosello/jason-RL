@@ -24,6 +24,7 @@ public class execute extends DefaultInternalAction {
 
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings("all")
 	@Override
 	public Object execute(TransitionSystem ts, final Unifier un, final Term[] arg) throws Exception {
 		BeliefBaseRL rlbb = (BeliefBaseRL) ts.getAg().getBB();

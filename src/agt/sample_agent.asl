@@ -1,23 +1,18 @@
-// Agent sample_agent in project jacamoRL
-
-/* Initial beliefs and rules */
 rl_parameter(policy, egreedy).
-rl_parameter(alpha, 0.6).
+rl_parameter(alpha, 0.1).
 rl_parameter(gamma, 0.9).
-rl_parameter(epsilon, 0.3).
+rl_parameter(epsilon, 1).
+rl_parameter(epsilon_decay, 0.99996).
+rl_parameter(epsilon_min, 0.01).
 
 rl_observe(reach_finish, pos).
 
-rl_reward(reach_finish, 100) :- finishline.
-rl_reward(reach_finish, -1) :- not finishline.
+rl_reward(reach_finish, 30) :- finishline.
+rl_reward(reach_finish, -2) :- not finishline.
 
 rl_terminal(reach_finish) :- finishline.
 
-/* Initial goals */
-
 !start.
-
-/* Plans */
 
 //example of use of expected return
 /* 
@@ -33,7 +28,3 @@ rl_terminal(reach_finish) :- finishline.
 +!move(Direction) <- move(Direction).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
-{ include("$jacamoJar/templates/common-moise.asl") }
-
-// uncomment the include below to have an agent compliant with its organisation
-//{ include("$moiseJar/asl/org-obedient.asl") }

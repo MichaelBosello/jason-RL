@@ -15,7 +15,7 @@ import cartago.ObsProperty;
 
 public class GridWorldEnv extends Artifact {
 
-	public static final int GRID_SIZE = 5;
+	public static final int GRID_SIZE = 10;
 	public static final int FINISH_LINE = 16; // finsh line code in grid model
 
 	private static final boolean SHOW_VIEW = false;
@@ -27,6 +27,9 @@ public class GridWorldEnv extends Artifact {
 
 	private int minNumberOfMoves;
 	private int movesDone = 0;
+	private int episodes = 0;
+	private int episodesError = 0;
+	private double averageError = 0;
 
 	@OPERATION
 	public void init() {
@@ -44,7 +47,7 @@ public class GridWorldEnv extends Artifact {
 
 		try {
 			if (SHOW_VIEW) {
-				Thread.sleep(200);
+				Thread.sleep(50);
 			}
 		} catch (Exception e) {
 		}
@@ -79,8 +82,20 @@ public class GridWorldEnv extends Artifact {
 		p.updateValue(1, agentLocation.y);
 
 		if (model.hasObject(FINISH_LINE, agentLocation)) {
-			log("Finsh line reached in " + movesDone + " step, min path lenght: " + minNumberOfMoves);
+			episodes++;
+			episodesError++;
+			int error = movesDone - minNumberOfMoves;
+			averageError = (double) (averageError + ((error - averageError)/episodesError));
+			log("episode " + episodes + 
+					" - finsh line reached in " + movesDone + 
+					" step, min path lenght: " + minNumberOfMoves +
+					" error: " + error +
+					" average error last 100 ep: " + averageError);
 			movesDone = 0;
+			if (episodesError == 100) {
+				episodesError = 0;
+				averageError = 0;
+			}
 			if (!hasObsProperty("finishline"))
 				defineObsProperty("finishline");
 			model.reset();
@@ -135,6 +150,10 @@ public class GridWorldEnv extends Artifact {
 		void reset() {
 			int x = rnd.nextInt(GRID_SIZE);
 			int y = rnd.nextInt(GRID_SIZE);
+			while(x == finishline.x && y == finishline.y) {
+				x = rnd.nextInt(GRID_SIZE);
+				y = rnd.nextInt(GRID_SIZE);
+			}
 			setAgPos(0, x, y);
 			minNumberOfMoves = distance(getAgPos(0), finishline);
 		}
