@@ -10,11 +10,11 @@ public class ActionParameter implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	ParameterType type;
-	String name;
-	double min, max;
-	Set<String> set;
-	String value;
+	private ParameterType type;
+	private String name;
+	private double min, max;
+	private Set<String> set;
+	private String value;
 	
 	public ActionParameter(String name, int min, int max){
 		type = ParameterType.INT;
@@ -51,9 +51,12 @@ public class ActionParameter implements Serializable{
 	public ParameterType getType() { return type; }
 	
 	public String getValue() { return value; }
+	
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -69,6 +72,7 @@ public class ActionParameter implements Serializable{
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -106,7 +110,4 @@ public class ActionParameter implements Serializable{
 		return "ActionParameter [type=" + type + ", name=" + name + ", min=" + min + ", max=" + max + ", set=" + set
 				+ ", value=" + value + "]";
 	}
-	
-	
-	
 }

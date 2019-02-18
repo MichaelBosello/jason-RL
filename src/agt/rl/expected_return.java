@@ -19,21 +19,21 @@ public class expected_return extends DefaultInternalAction {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public Object execute(TransitionSystem ts, final Unifier un, final Term[] arg) throws Exception {
-		BeliefBaseRL rlbb = (BeliefBaseRL) ts.getAg().getBB();
-		if(arg.length != 2 || !arg[1].isVar()) {
+	public Object execute(TransitionSystem transitionSystem, final Unifier unifier, final Term[] arguments) throws Exception {
+		BeliefBaseRL rlBB = (BeliefBaseRL) transitionSystem.getAg().getBB();
+		if(arguments.length != 2 || !arguments[1].isVar()) {
 			return false;
 		}
-		String goal = Goal.extractGoal(arg[0], un);
+		String goal = Goal.extractGoal(arguments[0], unifier);
 		if(goal == null) {
 			return false;
 		}
-		Set<Literal> observation = rlbb.getCurrentObservation(goal);
-		Set<Action> action = RelevantPlans.getActionsForGoalFromKB(ts, un, goal);
-		AlgorithmRL rl = rlbb.getRLInstance();
+		Set<Literal> observation = rlBB.getCurrentObservation(goal);
+		Set<Action> action = RelevantPlans.getActionsForGoalFromPL(transitionSystem, unifier, goal);
+		AlgorithmRL rl = rlBB.getRLInstance();
 		
 		double expectedReturn = rl.expectedReturn(action, observation);
 		NumberTerm result = new NumberTermImpl(expectedReturn);
-		return un.unifies(result, arg[1]);
+		return unifier.unifies(result, arguments[1]);
 	}
 }

@@ -20,21 +20,28 @@ public class RelevantPlans {
 	public static final String PARAM_REAL_FUNCTOR = "real";
 	public static final String PARAM_INT_FUNCTOR = "int";
 	
-	public static Set<Action> getActionsForGoalFromKB(
-			TransitionSystem ts, Unifier un, String goal) throws NoValueException{
-		List<Plan> plans = ts.getAg().getPL().getPlans();
-		Set<Action> action = new HashSet<>();
+	public static Set<Action> getActionsForGoalFromPL(
+			TransitionSystem transitionSystem, Unifier unifier, String goal) throws NoValueException{
+		List<Plan> plans = transitionSystem.getAg().getPL().getPlans();
+		Set<Action> actions = new HashSet<>();
+		
+		//search for plans with rl label
 		for(Plan plan : plans) {
 			if(plan.getLabel().getAnnot(GOAL_FUNCTOR) != null) {
 				for(Term annotationGoal : plan.getLabel().getAnnot(GOAL_FUNCTOR).getTerms()) {
-					if(annotationGoal.toString().equals(goal))
-					if(plan.getContext() == null ||
-					   plan.getContext().logicalConsequence(ts.getAg(), un).hasNext()) {
+					//proceed if plan is for goal and is suitable in current context
+					if(annotationGoal.toString().equals(goal) &&
+					   plan.getContext() == null ||
+					   plan.getContext().logicalConsequence(transitionSystem.getAg(), unifier).hasNext()) {
+						
 						String planName = plan.getTrigger().getLiteral().toString();
 						Set<ActionParameter> parameters = new HashSet<>();
+						
+						//parse the parameter labels to set parameter name and type
 						if(plan.getLabel().getAnnot(ACTION_PARAM_FUNCTOR) != null)
-						for(Term ap : plan.getLabel().getAnnot(ACTION_PARAM_FUNCTOR).getTerms()) {
-							Literal actionParameter = (Literal) ap;
+						for(Term actionParameterTerm 
+								: plan.getLabel().getAnnot(ACTION_PARAM_FUNCTOR).getTerms()) {
+							Literal actionParameter = (Literal) actionParameterTerm;
 							String paramName = actionParameter.getFunctor();
 							Literal paramTypeLit = (Literal) actionParameter.getTerm(0);
 							String paramType = paramTypeLit.getFunctor();
@@ -54,11 +61,12 @@ public class RelevantPlans {
 								parameters.add(new ActionParameter(paramName, min, max));
 							}
 						}
-						action.add(new Action(planName, parameters));
+						
+						actions.add(new Action(planName, parameters));
 					}
 				}
 			}
 		}
-		return action;
+		return actions;
 	}
 }

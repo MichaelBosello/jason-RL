@@ -71,7 +71,4 @@ public class Action implements Serializable{
 	public String toString() {
 		return "Action [name=" + name + ", parameters=" + parameters + "]";
 	}
-	
-	
-
 }
