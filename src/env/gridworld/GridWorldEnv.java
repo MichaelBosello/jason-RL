@@ -7,46 +7,31 @@ import jason.environment.grid.Location;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 import cartago.Artifact;
 import cartago.OPERATION;
 import cartago.ObsProperty;
 
+import simulation.EpisodicSimulation;
+
 public class GridWorldEnv extends Artifact {
 
-	public static final int GRID_SIZE =5;
+	public static final int GRID_SIZE = 5;
 	public static final int FINISH_LINE = 16; // finsh line code in grid model
 
 	private static final boolean SHOW_VIEW = false;
 
 	private GridModel model;
 	private GridView view;
-
 	Location finishline = new Location(GRID_SIZE - 1, GRID_SIZE - 1);
 
-	private int minNumberOfMoves;
+	private EpisodicSimulation simulation = new EpisodicSimulation();
 	private int movesDone = 0;
-	private int episodes = 0;
-	private int episodesError = 0;
-	private double averageError = 0;
-	
-	private final static int SAVE_RESULT_AT = 6000;
-	PrintWriter simultationResultsWriter;
+	private int minNumberOfMoves;
 
 	@OPERATION
 	public void init() {
-		try {
-			simultationResultsWriter = new PrintWriter("simulation.txt", "UTF-8");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		
 		model = new GridModel();
 		if (SHOW_VIEW) {
 			view = new GridView(model);
@@ -58,13 +43,11 @@ public class GridWorldEnv extends Artifact {
 
 	@OPERATION
 	public void move(String move) {
-
 		try {
 			if (SHOW_VIEW) {
 				Thread.sleep(50);
 			}
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 
 		movesDone++;
 
@@ -84,51 +67,30 @@ public class GridWorldEnv extends Artifact {
 		}
 
 		updatePercepts();
-
 	}
 
 	void updatePercepts() {
-
 		Location agentLocation = model.getAgPos(0);
-
 		ObsProperty p = getObsProperty("pos");
 		p.updateValue(0, agentLocation.x);
 		p.updateValue(1, agentLocation.y);
 
 		if (model.hasObject(FINISH_LINE, agentLocation)) {
-			episodes++;
-			episodesError++;
 			int error = movesDone - minNumberOfMoves;
-			averageError = (double) (averageError + ((error - averageError)/episodesError));
-			log("episode " + episodes + 
-					" - finsh line reached in " + movesDone + 
-					" step, min path lenght: " + minNumberOfMoves +
-					" error: " +
-					error +
-					" - average error last 100 ep: " + averageError
-					);
-			if(episodes <= SAVE_RESULT_AT) {
-				simultationResultsWriter.println(error);
-			} else if(episodes == SAVE_RESULT_AT + 1) {
-				simultationResultsWriter.close();
-			}
+			simulation.episodeEnd(error);
 			movesDone = 0;
-			if (episodesError == 100) {
-				episodesError = 0;
-				averageError = 0;
-			}
+
 			if (!hasObsProperty("finishline"))
 				defineObsProperty("finishline");
 			model.reset();
 			Location newAgentLocation = model.getAgPos(0);
 			p.updateValue(0, newAgentLocation.x);
 			p.updateValue(1, newAgentLocation.y);
-		} else
+		} else {
 			try {
 				removeObsProperty("finishline");
-			} catch (IllegalArgumentException e) {
-			}
-
+			} catch (IllegalArgumentException e) {}
+		}
 	}
 
 	class GridModel extends GridWorldModel {
@@ -168,10 +130,10 @@ public class GridWorldEnv extends Artifact {
 			setAgPos(0, r1);
 		}
 
-		void reset() {
+		private void reset() {
 			int x = rnd.nextInt(GRID_SIZE);
 			int y = rnd.nextInt(GRID_SIZE);
-			while(x == finishline.x && y == finishline.y) {
+			while (x == finishline.x && y == finishline.y) {
 				x = rnd.nextInt(GRID_SIZE);
 				y = rnd.nextInt(GRID_SIZE);
 			}
