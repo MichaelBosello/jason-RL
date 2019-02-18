@@ -1,14 +1,14 @@
 rl_parameter(policy, egreedy).
-rl_parameter(alpha, 0.1).
+rl_parameter(alpha, 0.26).
 rl_parameter(gamma, 0.9).
-rl_parameter(epsilon, 1).
-rl_parameter(epsilon_decay, 0.99996).
-rl_parameter(epsilon_min, 0.01).
+rl_parameter(epsilon, 0.22).
+rl_parameter(epsilon_decay, 0.99992).
+rl_parameter(epsilon_min, 0.001).
 
 rl_observe(reach_finish, pos).
 
-rl_reward(reach_finish, 30) :- finishline.
-rl_reward(reach_finish, -2) :- not finishline.
+rl_reward(reach_finish, 10) :- finishline.
+rl_reward(reach_finish, -1) :- not finishline.
 
 rl_terminal(reach_finish) :- finishline.
 

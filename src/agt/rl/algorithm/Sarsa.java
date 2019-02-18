@@ -50,7 +50,7 @@ public class Sarsa implements AlgorithmRL{
 	
 	private double alpha = 0.5;
 	private double gamma = 0.5;
-	private double epsilon = 0.1;
+	private double epsilon = 0;
 	private double currentEpsilon = 0;
 	private double epsilonDecay = 1;
 	private double epsilonMin = 0;
@@ -137,17 +137,6 @@ public class Sarsa implements AlgorithmRL{
 		List<Action> actions = discretizeAction(action);
 		addNewActionToQ(state, actions);
 		
-		/*
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		System.out.println("alpha " + alpha + " gamma " + gamma +
-				" epsilon " + currentEpsilon + " policy " + policy);
-		System.out.println("reward " + reward);
-		System.out.println("State " + state);
-		System.out.println("Actions " + actions.toString());
-		System.out.println("q " + q.toString());
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		*/
-		
 		Action selectedAction = selectAction(state, actions);
 		
 		if(previousState != null && previousAction != null) {
@@ -160,7 +149,35 @@ public class Sarsa implements AlgorithmRL{
 		previousState = state;
 		previousAction = selectedAction;
 
-		if(isTerminal) {System.out.println(currentEpsilon);
+		if(isTerminal) {
+			
+			System.out.println("epsilon " + currentEpsilon);
+			
+			/*
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			System.out.println("alpha " + alpha + " gamma " + gamma +
+					" epsilon " + currentEpsilon + " policy " + policy);
+			System.out.println("reward " + reward);
+			System.out.println("State " + state);
+			System.out.println("Actions " + actions.toString());
+			System.out.println("q");
+			for(String pos : q.keySet()) {
+				Action sAct = null;
+				double actionValue = -Double.MAX_VALUE;
+				for(Entry<Action, Double> act : q.get(pos).entrySet()) {
+					if(act.getValue() > actionValue) {
+						sAct = act.getKey();
+						actionValue = act.getValue();
+					}
+				}
+				String val = ((ActionParameter)sAct.getParameters().toArray()[0]).getValue();
+				if(actionValue != 0)
+				System.out.print(pos + " " + val + " " + actionValue + " ");
+				System.out.println("");
+			}
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			*/
+			
 			previousState = null;
 			previousAction = null;
 			episode++;

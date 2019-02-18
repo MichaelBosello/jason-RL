@@ -7,6 +7,9 @@ import jason.environment.grid.Location;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 import cartago.Artifact;
@@ -15,7 +18,7 @@ import cartago.ObsProperty;
 
 public class GridWorldEnv extends Artifact {
 
-	public static final int GRID_SIZE = 10;
+	public static final int GRID_SIZE =5;
 	public static final int FINISH_LINE = 16; // finsh line code in grid model
 
 	private static final boolean SHOW_VIEW = false;
@@ -30,9 +33,20 @@ public class GridWorldEnv extends Artifact {
 	private int episodes = 0;
 	private int episodesError = 0;
 	private double averageError = 0;
+	
+	private final static int SAVE_RESULT_AT = 6000;
+	PrintWriter simultationResultsWriter;
 
 	@OPERATION
 	public void init() {
+		try {
+			simultationResultsWriter = new PrintWriter("simulation.txt", "UTF-8");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
 		model = new GridModel();
 		if (SHOW_VIEW) {
 			view = new GridView(model);
@@ -89,8 +103,15 @@ public class GridWorldEnv extends Artifact {
 			log("episode " + episodes + 
 					" - finsh line reached in " + movesDone + 
 					" step, min path lenght: " + minNumberOfMoves +
-					" error: " + error +
-					" average error last 100 ep: " + averageError);
+					" error: " +
+					error +
+					" - average error last 100 ep: " + averageError
+					);
+			if(episodes <= SAVE_RESULT_AT) {
+				simultationResultsWriter.println(error);
+			} else if(episodes == SAVE_RESULT_AT + 1) {
+				simultationResultsWriter.close();
+			}
 			movesDone = 0;
 			if (episodesError == 100) {
 				episodesError = 0;
