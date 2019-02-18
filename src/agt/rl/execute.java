@@ -26,46 +26,52 @@ public class execute extends DefaultInternalAction {
 
 	@SuppressWarnings("all")
 	@Override
-	public Object execute(TransitionSystem ts, final Unifier un, final Term[] arg) throws Exception {
-		BeliefBaseRL rlbb = (BeliefBaseRL) ts.getAg().getBB();
-		if(arg.length != 1) {
+	public Object execute(TransitionSystem transitionSystem, final Unifier unifier, final Term[] argument) throws Exception {
+		BeliefBaseRL rlBB = (BeliefBaseRL) transitionSystem.getAg().getBB();
+		if(argument.length != 1) {
 			return false;
 		}
-		String goal = Goal.extractGoal(arg[0], un);
+		String goal = Goal.extractGoal(argument[0], unifier);
 		if(goal == null) {
 			return false;
 		}
 		
-		Map<Term, Term> parameter = rlbb.getRlParameter();
-		Set<Literal> observation = rlbb.getCurrentObservation(goal);
-		double reward = rlbb.getCurrentReward(goal);
-		boolean isTerminal = rlbb.isCurrentStateTerminal(goal);
-		Set<Action> action = RelevantPlans.getActionsForGoalFromKB(ts, un, goal);		
+		Map<Term, Term> parameter = rlBB.getRlParameter();
+		Set<Literal> observation = rlBB.getCurrentObservation(goal);
+		double reward = rlBB.getCurrentReward(goal);
+		boolean isTerminal = rlBB.isCurrentStateTerminal(goal);
+		Set<Action> action = RelevantPlans.getActionsForGoalFromKB(transitionSystem, unifier, goal);		
 		
-		Action rlResult = rlbb.getRLInstance()
+		Action rlResult = rlBB.getRLInstance()
 				.nextAction(parameter, action, observation, reward, isTerminal);
 		String actionString = rlResult.getLiteralString();
+		
 		for(ActionParameter actionParameter : rlResult.getParameters()) {
+			//find the parameter name (a variable need the first letter uppercase, not allowed in label) e.g. direction -> Direction
 			String parameterName = actionParameter.getName();
 			String variable = parameterName.substring(0, 1).toUpperCase();
 			variable +=  parameterName.substring(1, parameterName.length());
+			//replace the variable with its value
 			actionString = actionString.replace(variable, actionParameter.getValue());
 		}
 
+		//the new plan based on rl: action + rl.execute 
 		PlanBody rlPlanBody = new PlanBodyImpl();
 		if(rlResult != null) {
 			rlPlanBody.add(new PlanBodyImpl(BodyType.achieve, ASSyntax.parseTerm(actionString)));
 		}
 		if(!isTerminal) {
-			String redoIA = "rl.execute(" + goal + ")";
-			rlPlanBody.add(new PlanBodyImpl(BodyType.internalAction, ASSyntax.parseTerm(redoIA)));
+			String redoRL = "rl.execute(" + goal + ")";
+			rlPlanBody.add(new PlanBodyImpl(BodyType.internalAction, ASSyntax.parseTerm(redoRL)));
 		}
 
-		Intention currentIntention = ts.getC().getSelectedIntention();
+		//add the plan on top of current intention
+		Intention currentIntention = transitionSystem.getC().getSelectedIntention();
 		IntendedMeans currentMeans = currentIntention.pop();
 		rlPlanBody.add(currentMeans.getCurrentStep());
 		currentMeans.insertAsNextStep(rlPlanBody);
 		currentIntention.push(currentMeans);
+		
 		return true;
 	}
 }
