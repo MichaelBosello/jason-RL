@@ -17,8 +17,8 @@ import jason.asSyntax.Term;
 import rl.beliefbase.BeliefBaseRL;
 import rl.component.Action;
 import rl.component.ActionParameter;
-import rl.component.Goal;
-import rl.component.RelevantPlans;
+import rl.component.GoalRL;
+import rl.component.PlanLibraryRL;
 
 public class execute extends DefaultInternalAction {
 
@@ -31,7 +31,7 @@ public class execute extends DefaultInternalAction {
 		if(argument.length != 1) {
 			return false;
 		}
-		String goal = Goal.extractGoal(argument[0], unifier);
+		String goal = GoalRL.extractGoal(argument[0], unifier);
 		if(goal == null) {
 			return false;
 		}
@@ -40,7 +40,7 @@ public class execute extends DefaultInternalAction {
 		Set<Literal> observation = rlBB.getCurrentObservation(goal);
 		double reward = rlBB.getCurrentReward(goal);
 		boolean isTerminal = rlBB.isCurrentStateTerminal(goal);
-		Set<Action> action = RelevantPlans.getActionsForGoalFromPL(transitionSystem, unifier, goal);		
+		Set<Action> action = PlanLibraryRL.getActionsForGoal(transitionSystem, unifier, goal);		
 		
 		Action rlResult = rlBB.getRLInstance()
 				.nextAction(parameter, action, observation, reward, isTerminal);

@@ -12,8 +12,8 @@ import jason.asSyntax.Term;
 import rl.algorithm.AlgorithmRL;
 import rl.beliefbase.BeliefBaseRL;
 import rl.component.Action;
-import rl.component.Goal;
-import rl.component.RelevantPlans;
+import rl.component.GoalRL;
+import rl.component.PlanLibraryRL;
 
 public class expected_return extends DefaultInternalAction {
 	private static final long serialVersionUID = 1L;
@@ -24,12 +24,12 @@ public class expected_return extends DefaultInternalAction {
 		if(arguments.length != 2 || !arguments[1].isVar()) {
 			return false;
 		}
-		String goal = Goal.extractGoal(arguments[0], unifier);
+		String goal = GoalRL.extractGoal(arguments[0], unifier);
 		if(goal == null) {
 			return false;
 		}
 		Set<Literal> observation = rlBB.getCurrentObservation(goal);
-		Set<Action> action = RelevantPlans.getActionsForGoalFromPL(transitionSystem, unifier, goal);
+		Set<Action> action = PlanLibraryRL.getActionsForGoal(transitionSystem, unifier, goal);
 		AlgorithmRL rl = rlBB.getRLInstance();
 		
 		double expectedReturn = rl.expectedReturn(action, observation);

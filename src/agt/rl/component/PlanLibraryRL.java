@@ -12,7 +12,7 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Term;
 
-public class RelevantPlans {
+public class PlanLibraryRL {
 	
 	public static final String GOAL_FUNCTOR = "rl_goal";
 	public static final String ACTION_PARAM_FUNCTOR = "rl_param";
@@ -20,7 +20,7 @@ public class RelevantPlans {
 	public static final String PARAM_REAL_FUNCTOR = "real";
 	public static final String PARAM_INT_FUNCTOR = "int";
 	
-	public static Set<Action> getActionsForGoalFromPL(
+	public static Set<Action> getActionsForGoal(
 			TransitionSystem transitionSystem, Unifier unifier, String goal) throws NoValueException{
 		List<Plan> plans = transitionSystem.getAg().getPL().getPlans();
 		Set<Action> actions = new HashSet<>();

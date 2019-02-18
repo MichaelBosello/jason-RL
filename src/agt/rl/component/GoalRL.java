@@ -3,7 +3,7 @@ package rl.component;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class Goal {
+public class GoalRL {
 	public static String extractGoal(Term term, Unifier unifier) {
 		String goal = null;
 		if(term.isGround()) {
