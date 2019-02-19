@@ -1,11 +1,5 @@
 package rl.algorithm;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,299 +15,151 @@ import rl.component.Action;
 import rl.component.Action.ParameterType;
 import rl.component.ActionParameter;
 
-public class Sarsa implements AlgorithmRL{
-	
-	private static final String ALPHA_TERM = "alpha";
-	private static final String GAMMA_TERM = "gamma";
-	private static final String EPSILON_TERM = "epsilon";
-	private static final String EPSILON_DECAY_TERM = "epsilon_decay";
-	private static final String EPSILON_MIN_TERM = "epsilon_min";
-	private static final String POLICY_TERM = "policy";
-	private static final String ONLY_EXPLOIT_POLICY = "exploit_only";
-	private static final String EGREEDY_POLICY = "egreedy";
-	
-	private String value_function_directory = "valuefunction";
-	private String value_function_filename = "/learnedvf";
-	private String value_function_extension = ".sar";
-	private String value_function_file = value_function_directory + value_function_filename + value_function_extension;
-	
+public class Sarsa implements AlgorithmRL {
+
+	BehaviourSerializer serializer = new BehaviourSerializer();
+	AlgorithmParameter parameters = new AlgorithmParameter();
+
 	private double realStepForDiscretization = 100;
 	private Random randomEGreedy = new Random();
-	private ObjectOutputStream outObject;
-	private FileOutputStream outFile;
-	private int episode = 1;
-	private int episodeForSaving = 1;
-	private int writeEveryNEpisode = 400;
-	
-	private boolean saveProgress = false;
-	private boolean loadProgress = false;
-	
-	private double alpha = 0.5;
-	private double gamma = 0.5;
-	private double epsilon = 0;
-	private double currentEpsilon = 0;
-	private double epsilonDecay = 1;
-	private double epsilonMin = 0;
-	private double initialActionValue = 0;
-	private String policy = EGREEDY_POLICY;
-	private boolean dynamicEpsilon = true;
-	
+
 	private Map<String, Map<Action, Double>> q = new HashMap<>();
-	
+
 	private String previousState = null;
 	private Action previousAction = null;
-	
+
 	@SuppressWarnings("unchecked")
 	public Sarsa() {
-		
-		File directory = new File(value_function_directory);
-	    if (saveProgress && !directory.exists()){
-	        directory.mkdir();
-	    }
-	    
-	    File file = new File(value_function_file);
-	    if (file.isFile() && file.canRead()) {
-	    	if(loadProgress) {
-				try {
-					FileInputStream fileIn = new FileInputStream(value_function_file);
-					ObjectInputStream in = new ObjectInputStream(fileIn);
-					q = (Map<String, Map<Action, Double>>) in.readObject();
-					in.close();
-					fileIn.close();
-				} catch (IOException i) {
-					System.out.println("Can't read value function file, start with new q");
-				} catch (ClassNotFoundException c) {
-					c.printStackTrace();
-				}
-			}
-	    } else {
-	    	if(saveProgress) {
-		    	try {
-					file.createNewFile();
-				} catch (IOException e) { e.printStackTrace(); }
-	    	}
-	    }
-		
-		if(q == null) {
-			q = new HashMap<>();
+		if (serializer.getBehaviour() != null) {
+			q = (Map<String, Map<Action, Double>>) serializer.getBehaviour();
 		}
 	}
-	
+
 	@Override
 	public double expectedReturn(Set<Action> action, Set<Literal> observation) {
 		String state = observationToState(observation);
 		Map<Action, Double> valueFunctionState = q.get(state);
-		if(valueFunctionState != null) {
+		if (valueFunctionState != null) {
 			List<Action> actions = discretizeAction(action);
 			Action selectedAction = selectAction(state, actions);
-			if(valueFunctionState.containsKey(selectedAction)) {
+			if (valueFunctionState.containsKey(selectedAction)) {
 				double expecterReward = valueFunctionState.get(selectedAction);
 				return expecterReward;
 			}
 		}
-		return initialActionValue;
+		return parameters.getInitialActionValue();
 	}
 
 	@Override
-	public Action nextAction(
-			Map<Term, Term> parameter,
-			Set<Action> action,
-			Set<Literal> observation,
-			double reward,
+	public Action nextAction(Map<Term, Term> parameter, Set<Action> action, Set<Literal> observation, double reward,
 			boolean isTerminal) {
-		
-		updateParameters(parameter);
-		
-		if(currentEpsilon == 0) {
-			currentEpsilon = epsilon;
-		}
-		currentEpsilon = currentEpsilon * epsilonDecay;
-		if(currentEpsilon < epsilonMin) {
-			currentEpsilon = epsilonMin;
-		}
-		
-		
+
+		parameters.updateParameters(parameter);
+
 		String state = observationToState(observation);
 		List<Action> actions = discretizeAction(action);
 		addNewActionToQ(state, actions);
-		
+
 		Action selectedAction = selectAction(state, actions);
-		
-		if(previousState != null && previousAction != null) {
+
+		if (previousState != null && previousAction != null) {
 			double qSA = q.get(previousState).get(previousAction);
 			double qS1A1 = q.get(state).get(selectedAction);
-			double q1 = qSA + alpha * (reward + gamma * (qS1A1 - qSA));
+			double q1 = qSA + parameters.getAlpha() * (reward + parameters.getGamma() * (qS1A1 - qSA));
 			q.get(previousState).put(previousAction, q1);
 		}
-		
+
 		previousState = state;
 		previousAction = selectedAction;
 
-		if(isTerminal) {
-			
-			System.out.println("epsilon " + currentEpsilon);
-			
-			/*
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("alpha " + alpha + " gamma " + gamma +
-					" epsilon " + currentEpsilon + " policy " + policy);
-			System.out.println("reward " + reward);
-			System.out.println("State " + state);
-			System.out.println("Actions " + actions.toString());
-			System.out.println("q");
-			for(String pos : q.keySet()) {
-				Action sAct = null;
-				double actionValue = -Double.MAX_VALUE;
-				for(Entry<Action, Double> act : q.get(pos).entrySet()) {
-					if(act.getValue() > actionValue) {
-						sAct = act.getKey();
-						actionValue = act.getValue();
-					}
-				}
-				String val = ((ActionParameter)sAct.getParameters().toArray()[0]).getValue();
-				if(actionValue != 0)
-				System.out.print(pos + " " + val + " " + actionValue + " ");
-				System.out.println("");
-			}
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			*/
-			
+		if (isTerminal) {
 			previousState = null;
 			previousAction = null;
-			episode++;
-			if(dynamicEpsilon) {
-				currentEpsilon = (double) 1/episode;
-			}
-			episodeForSaving++;
-			if(saveProgress && episodeForSaving >= writeEveryNEpisode) {
-				episodeForSaving = 0;
-				System.out.println("Start writing progress..");
-				try {
-					outFile = new FileOutputStream(value_function_file, false);
-					outObject = new ObjectOutputStream(outFile);
-					outObject.writeObject(q);
-					outObject.close();
-					outFile.close();
-				} catch (IOException i) { i.printStackTrace(); }
-				System.out.println("..end writing");
-			}
+
+			parameters.episodeEnd();
+			serializer.episodeEnd(q);
 		}
-		
+
 		return selectedAction;
 	}
-	
+
 	private Action selectAction(String state, List<Action> actions) {
-		if(policy.equals(EGREEDY_POLICY) && randomEGreedy.nextDouble() < currentEpsilon) {
+		if (parameters.getPolicy().equals(AlgorithmParameter.EGREEDY_POLICY)
+				&& randomEGreedy.nextDouble() < parameters.getEpsilon()) {
 			int randomSelected = randomEGreedy.nextInt(actions.size());
 			return actions.get(randomSelected);
 		}
 		Action selectedAction = null;
 		double actionValue = -Double.MAX_VALUE;
-		for(Entry<Action, Double> action : q.get(state).entrySet()) {
-			if(action.getValue() > actionValue) {
+		for (Entry<Action, Double> action : q.get(state).entrySet()) {
+			if (action.getValue() > actionValue) {
 				selectedAction = action.getKey();
 				actionValue = action.getValue();
 			}
 		}
 		return selectedAction;
 	}
-	
+
 	private void addNewActionToQ(String state, List<Action> actions) {
 		Map<Action, Double> actionValue = new HashMap<>();
-		if(q.containsKey(state)) {
+		if (q.containsKey(state)) {
 			actionValue = q.get(state);
 		}
-		for(Action action : actions) {
-			if(!actionValue.containsKey(action)) {
-				actionValue.put(action, initialActionValue);
+		for (Action action : actions) {
+			if (!actionValue.containsKey(action)) {
+				actionValue.put(action, parameters.getInitialActionValue());
 			}
 		}
 		q.put(state, actionValue);
 	}
-	
+
 	private String observationToState(Set<Literal> observations) {
 		String state = "";
-		for(Literal observation : observations) {
+		for (Literal observation : observations) {
 			state += observation.toString();
 		}
 		return state;
 	}
-	
-	private void updateParameters(Map<Term, Term> parameters) {
-		for(Entry<Term, Term> parameter : parameters.entrySet()) {
-			String parameterKey = parameter.getKey().toString();
-			String parameterValue = parameter.getValue().toString();
-			
-			if(parameterKey.equals(POLICY_TERM)) {
-				if(parameterValue.equals(ONLY_EXPLOIT_POLICY) || parameterValue.equals(EGREEDY_POLICY)) {
-					policy = parameterValue;
-				}
-			} else {
-				if(parameterKey.equals(EPSILON_TERM) && parameterValue.equals("1/t")) {
-					dynamicEpsilon = true;
-				} else {
-					double value = 0;
-					try {
-						 value = Double.parseDouble(parameterValue);
-					} catch(Exception e) {}
-					if(value > 0) {
-						if(parameterKey.equals(ALPHA_TERM)) {
-							alpha = value;
-						} else if(parameterKey.equals(GAMMA_TERM)) {
-							gamma = value;
-						} else if(parameterKey.equals(EPSILON_TERM)) {
-							epsilon = value;
-							dynamicEpsilon = false;
-						} else if(parameterKey.equals(EPSILON_DECAY_TERM)) {
-							epsilonDecay = value;
-						} else if(parameterKey.equals(EPSILON_MIN_TERM)) {
-							epsilonMin = value;
-						}
-					}
-				}
-			} 
-		}
-	}
-	
+
 	private List<Action> discretizeAction(Set<Action> parametrizedAction) {
 		List<Action> discreteActions = new ArrayList<>();
-		
-		for(Action action : parametrizedAction) {
+
+		for (Action action : parametrizedAction) {
 			Set<Action> discreteSet = new HashSet<>();
 			discreteSet.add(action);
-			for(ActionParameter param : action.getParameters()) {
+			for (ActionParameter param : action.getParameters()) {
 				Set<Action> tmpSet = new HashSet<>();
-				if(param.getType().equals(ParameterType.SET)) {
-					for(String value : param.getSet()) {
-						for(Action next : discreteSet) {
+				if (param.getType().equals(ParameterType.SET)) {
+					for (String value : param.getSet()) {
+						for (Action next : discreteSet) {
 							Action nextDiscrete = new Action(next);
-							for(ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
-								if(paramToUpdate.equals(param)) {
+							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
+								if (paramToUpdate.equals(param)) {
 									paramToUpdate.setValue(value);
 								}
 							}
 							tmpSet.add(nextDiscrete);
 						}
 					}
-				} else if(param.getType().equals(ParameterType.INT)) {
-					for(int value = (int) param.getMin(); value < param.getMax(); value++) {
-						for(Action next : discreteSet) {
+				} else if (param.getType().equals(ParameterType.INT)) {
+					for (int value = (int) param.getMin(); value < param.getMax(); value++) {
+						for (Action next : discreteSet) {
 							Action nextDiscrete = new Action(next);
-							for(ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
-								if(paramToUpdate.equals(param)) {
+							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
+								if (paramToUpdate.equals(param)) {
 									paramToUpdate.setValue(String.valueOf(value));
 								}
 							}
 							tmpSet.add(nextDiscrete);
 						}
 					}
-				} else if(param.getType().equals(ParameterType.REAL)) {
+				} else if (param.getType().equals(ParameterType.REAL)) {
 					double step = (param.getMax() - param.getMin()) / realStepForDiscretization;
-					for(double value = param.getMin(); value < param.getMax(); value+= step) {
-						for(Action next : discreteSet) {
+					for (double value = param.getMin(); value < param.getMax(); value += step) {
+						for (Action next : discreteSet) {
 							Action nextDiscrete = new Action(next);
-							for(ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
-								if(paramToUpdate.equals(param)) {
+							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
+								if (paramToUpdate.equals(param)) {
 									paramToUpdate.setValue(String.valueOf(value));
 								}
 							}
@@ -321,12 +167,12 @@ public class Sarsa implements AlgorithmRL{
 						}
 					}
 				}
-				
+
 				discreteSet = tmpSet;
 			}
 			discreteActions.addAll(discreteSet);
 		}
-		
+
 		return discreteActions;
 	}
 
