@@ -26,6 +26,7 @@ public class GridWorldEnv extends Artifact {
 	private GridView view;
 	Location finishline = new Location(GRID_SIZE - 1, GRID_SIZE - 1);
 
+	//to track the performance
 	private EpisodicSimulation simulation = new EpisodicSimulation();
 	private int movesDone = 0;
 	private int minNumberOfMoves;
@@ -61,7 +62,6 @@ public class GridWorldEnv extends Artifact {
 			} else if (move.equals("down")) {
 				model.down();
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -71,9 +71,9 @@ public class GridWorldEnv extends Artifact {
 
 	void updatePercepts() {
 		Location agentLocation = model.getAgPos(0);
-		ObsProperty p = getObsProperty("pos");
-		p.updateValue(0, agentLocation.x);
-		p.updateValue(1, agentLocation.y);
+		ObsProperty position = getObsProperty("pos");
+		position.updateValue(0, agentLocation.x);
+		position.updateValue(1, agentLocation.y);
 
 		if (model.hasObject(FINISH_LINE, agentLocation)) {
 			int error = movesDone - minNumberOfMoves;
@@ -84,8 +84,8 @@ public class GridWorldEnv extends Artifact {
 				defineObsProperty("finishline");
 			model.reset();
 			Location newAgentLocation = model.getAgPos(0);
-			p.updateValue(0, newAgentLocation.x);
-			p.updateValue(1, newAgentLocation.y);
+			position.updateValue(0, newAgentLocation.x);
+			position.updateValue(1, newAgentLocation.y);
 		} else {
 			try {
 				removeObsProperty("finishline");

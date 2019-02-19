@@ -24,7 +24,7 @@ rl_terminal(reach_finish) :- finishline.
 //without expected return
 +!start : true <- rl.execute(reach_finish); !start. //!start in order to continue after the end of the episode
 
-@exe[rl_goal(reach_finish), rl_param(direction(set(right, left, up, down)))]
+@action[rl_goal(reach_finish), rl_param(direction(set(right, left, up, down)))]
 +!move(Direction) <- move(Direction).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
