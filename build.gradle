@@ -30,6 +30,8 @@ repositories {
 
 dependencies {
     compile group: 'org.jacamo', name: 'jacamo', version: '0.7'
+    compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.23.2'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.23.2'
     
 }
 
