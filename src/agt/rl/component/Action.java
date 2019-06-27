@@ -1,8 +1,8 @@
 package rl.component;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Action implements Serializable{
 
@@ -13,9 +13,9 @@ public class Action implements Serializable{
 	}
 	
 	private final String name;
-	private final Set<ActionParameter> parameters;
+	private final List<ActionParameter> parameters;
 	
-	public Action(String name, Set<ActionParameter> parameters){
+	public Action(String name, List<ActionParameter> parameters){
 		this.name = name;
 		this.parameters = parameters;
 	}
@@ -27,14 +27,14 @@ public class Action implements Serializable{
 	
 	public Action(Action copy){
 		this.name = copy.name;
-		this.parameters = new HashSet<>();
+		this.parameters = new ArrayList<>();
 		for(ActionParameter param : copy.parameters) {
 			parameters.add(new ActionParameter(param));
 		}
 	}
 	
 	public String getLiteralString() { return name; }
-	public Set<ActionParameter> getParameters() { return parameters; }
+	public List<ActionParameter> getParameters() { return parameters; }
 
 	@Override
 	public int hashCode() {

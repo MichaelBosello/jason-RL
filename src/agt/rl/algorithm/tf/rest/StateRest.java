@@ -5,7 +5,7 @@ import java.util.List;
 public class StateRest<T> {
     private List<T> state;
     private String state_type;
-    private float reward;
+    private double reward;
     private boolean is_terminal;
 
     public List<T> getState() {
@@ -24,11 +24,11 @@ public class StateRest<T> {
         this.state_type = state_type;
     }
 
-    public float getReward() {
+    public double getReward() {
         return reward;
     }
 
-    public void setReward(float reward) {
+    public void setReward(double reward) {
         this.reward = reward;
     }
 

@@ -12,18 +12,26 @@ import jason.asSyntax.Term;
 import jason.bb.DefaultBeliefBase;
 import rl.algorithm.AlgorithmRL;
 import rl.algorithm.Sarsa;
+import rl.algorithm.tf.TensorFlowAgent;
 
 public class BeliefBaseRL extends DefaultBeliefBase {
 
 	public static final String PARAMETER_FUNCTOR = "rl_parameter";
 	public static final String OBSERVE_FUNCTOR = "rl_observe";
+	public static final String ALGORITHM_FUNCTOR = "rl_algorithm";
+	
+	public static final String DQN_ID = "dqn";
+	public static final String SARSA_ID = "sarsa";
 
 	Agent agentReference;
-	AlgorithmRL rl = new Sarsa();
 
 	Map<Term, Term> parameter = new ConcurrentHashMap<>();// Parameter name -> parameter value
 	Map<String, Set<String>> goalObservation = new ConcurrentHashMap<>();// goal, observation list
+	Map<String, Set<Term>> goalObservationTerm = new ConcurrentHashMap<>();// goal, observation list
 	Set<String> trackAll = new HashSet<>();
+	
+	Map<String, AlgorithmRL> rl = new ConcurrentHashMap<>();
+	Set<String> rlActive = new HashSet<>();
 
 	@Override
 	public void init(Agent ag, String[] args) {
@@ -57,18 +65,43 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 				String goal = belief.getTerm(0).toString();
 				Term observe = belief.getTerm(1);
 
-				trackAll.remove(goal);
 				if (observe.isUnnamedVar()) {
 					trackAll.add(goal);
 					System.out.println("Goal " + goal + " tracks all");
 				} else if (observe.isList()) {
 					((ListTerm) observe).forEach(o -> {
-						putMapSet(goalObservation, goal, o.toString());
-						System.out.println("Observe " + o.toString() + " for goal " + goal);
+						String oString = o.toString();
+						String observationFunctor = oString;
+						if(oString.contains("(")) {
+							observationFunctor = oString.substring(0, oString.indexOf("("));
+						}
+						putMapSet(goalObservationTerm, goal, o);
+						putMapSet(goalObservation, goal, observationFunctor);
+						System.out.println("Observe " + observationFunctor + " for goal " + goal);
 					});
-				} else if (observe.isGround()) {
-					putMapSet(goalObservation, goal, observe.toString());
-					System.out.println("Observe " + observe.toString() + " for goal " + goal);
+				} else {
+					String oString = observe.toString();
+					String observationFunctor = oString;
+					if(oString.contains("(")) {
+						observationFunctor = oString.substring(0, oString.indexOf("("));
+					}
+					putMapSet(goalObservationTerm, goal, observe);
+					putMapSet(goalObservation, goal, observationFunctor);
+					System.out.println("Observe " + observationFunctor + " for goal " + goal);
+				}
+			}
+		} else if (functor.equals(ALGORITHM_FUNCTOR)) {
+			if (belief.getArity() == 2) {
+				String goal = belief.getTerm(0).toString();
+				String algorithm = belief.getTerm(1).toString();
+				if(!rl.containsKey(goal)) {
+					if(algorithm.equals(DQN_ID)) {
+						rl.put(goal, new TensorFlowAgent(goal));
+					} else if(algorithm.equals(SARSA_ID)) {
+						rl.put(goal, new Sarsa());
+					} else {
+						rl.put(goal, new Sarsa());
+					}
 				}
 			}
 		}
@@ -98,10 +131,15 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 		return currentObservation;
 	}
 	
+	public Set<Term> getObservedList(String goal){
+		return goalObservationTerm.get(goal);
+	}
 	
-	
-	public AlgorithmRL getRLInstance() {
-		return rl;
+	public AlgorithmRL getRLInstance(String goal) {
+		if(!rlActive.contains(goal)) {
+			rl.get(goal).initialize(agentReference, this);
+		}
+		return rl.get(goal);
 	}
 
 	public Map<Term, Term> getRlParameter() {

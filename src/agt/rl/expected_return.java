@@ -30,7 +30,7 @@ public class expected_return extends DefaultInternalAction {
 		}
 		Set<Literal> observation = rlBB.getCurrentObservation(goal);
 		Set<Action> action = PlanLibraryRL.getActionsForGoal(transitionSystem, unifier, goal);
-		AlgorithmRL rl = rlBB.getRLInstance();
+		AlgorithmRL rl = rlBB.getRLInstance(goal);
 		
 		double expectedReturn = rl.expectedReturn(action, observation);
 		NumberTerm result = new NumberTermImpl(expectedReturn);

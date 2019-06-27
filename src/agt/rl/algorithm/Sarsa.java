@@ -9,8 +9,10 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
+import jason.asSemantics.Agent;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
+import rl.beliefbase.BeliefBaseRL;
 import rl.component.Action;
 import rl.component.Action.ParameterType;
 import rl.component.ActionParameter;
@@ -175,5 +177,8 @@ public class Sarsa implements AlgorithmRL {
 
 		return discreteActions;
 	}
+
+	@Override
+	public void initialize(Agent agent, BeliefBaseRL bb) {}
 
 }

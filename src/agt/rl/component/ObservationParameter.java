@@ -4,39 +4,34 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import rl.component.Action.ParameterType;
+import rl.component.Observation.ParameterType;
 
-public class ActionParameter implements Serializable{
+public class ObservationParameter implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
 	private ParameterType type;
-	private String name;
 	private double min, max;
 	private List<String> set;
 	private String value;
 	
-	public ActionParameter(String name, int min, int max){
+	public ObservationParameter(int min, int max){
 		type = ParameterType.INT;
-		this.name = name;
 		this.min = min;
 		this.max = max;
 	}
-	public ActionParameter(String name, double min, double max){
+	public ObservationParameter(double min, double max){
 		type = ParameterType.REAL;
-		this.name = name;
 		this.min = min;
 		this.max = max;
 	}
-	public ActionParameter(String name, List<String> set){
+	public ObservationParameter(List<String> set){
 		type = ParameterType.SET;
-		this.name = name;
 		this.set = set;
 	}
 	
-	public ActionParameter(ActionParameter copy) {
+	public ObservationParameter(ObservationParameter copy) {
 		type = copy.type;
-		this.name = copy.name;
 		this.min = copy.min;
 		this.max = copy.max;
 		if(copy.set != null) {
@@ -44,7 +39,6 @@ public class ActionParameter implements Serializable{
 		}
 	}
 	
-	public String getName() { return name; }
 	public double getMin() { return min; }
 	public double getMax() { return max; }
 	public List<String> getSet() { return set; }
@@ -66,7 +60,6 @@ public class ActionParameter implements Serializable{
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(min);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((set == null) ? 0 : set.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
@@ -81,15 +74,10 @@ public class ActionParameter implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ActionParameter other = (ActionParameter) obj;
+		ObservationParameter other = (ObservationParameter) obj;
 		if (Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max))
 			return false;
 		if (Double.doubleToLongBits(min) != Double.doubleToLongBits(other.min))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
 			return false;
 		if (set == null) {
 			if (other.set != null)
@@ -107,7 +95,7 @@ public class ActionParameter implements Serializable{
 	}
 	@Override
 	public String toString() {
-		return "ActionParameter [type=" + type + ", name=" + name + ", min=" + min + ", max=" + max + ", set=" + set
+		return "ActionParameter [type=" + type + ", min=" + min + ", max=" + max + ", set=" + set
 				+ ", value=" + value + "]";
 	}
 }

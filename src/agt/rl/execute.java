@@ -42,7 +42,7 @@ public class execute extends DefaultInternalAction {
 		boolean isTerminal = rlBB.isCurrentStateTerminal(goal);
 		Set<Action> action = PlanLibraryRL.getActionsForGoal(transitionSystem, unifier, goal);		
 		
-		Action rlResult = rlBB.getRLInstance()
+		Action rlResult = rlBB.getRLInstance(goal)
 				.nextAction(parameter, action, observation, reward, isTerminal);
 		String actionString = rlResult.getLiteralString();
 		
