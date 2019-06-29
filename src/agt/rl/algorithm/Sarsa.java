@@ -1,8 +1,6 @@
 package rl.algorithm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,15 +12,12 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import rl.beliefbase.BeliefBaseRL;
 import rl.component.Action;
-import rl.component.Action.ParameterType;
-import rl.component.ActionParameter;
 
 public class Sarsa implements AlgorithmRL {
 
 	BehaviourSerializer serializer = new BehaviourSerializer();
 	AlgorithmParameter parameters = new AlgorithmParameter();
 
-	private double realStepForDiscretization = 100;
 	private Random randomEGreedy = new Random();
 
 	private Map<String, Map<Action, Double>> q = new HashMap<>();
@@ -42,7 +37,7 @@ public class Sarsa implements AlgorithmRL {
 		String state = observationToState(observation);
 		Map<Action, Double> valueFunctionState = q.get(state);
 		if (valueFunctionState != null) {
-			List<Action> actions = discretizeAction(action);
+			List<Action> actions = Action.discretizeAction(action);
 			Action selectedAction = selectAction(state, actions);
 			if (valueFunctionState.containsKey(selectedAction)) {
 				double expecterReward = valueFunctionState.get(selectedAction);
@@ -59,7 +54,7 @@ public class Sarsa implements AlgorithmRL {
 		parameters.updateParameters(parameter);
 
 		String state = observationToState(observation);
-		List<Action> actions = discretizeAction(action);
+		List<Action> actions = Action.discretizeAction(action);
 		addNewActionToQ(state, actions);
 
 		Action selectedAction = selectAction(state, actions);
@@ -121,61 +116,6 @@ public class Sarsa implements AlgorithmRL {
 			state += observation.toString();
 		}
 		return state;
-	}
-
-	private List<Action> discretizeAction(Set<Action> parametrizedAction) {
-		List<Action> discreteActions = new ArrayList<>();
-
-		for (Action action : parametrizedAction) {
-			Set<Action> discreteSet = new HashSet<>();
-			discreteSet.add(action);
-			for (ActionParameter param : action.getParameters()) {
-				Set<Action> tmpSet = new HashSet<>();
-				if (param.getType().equals(ParameterType.SET)) {
-					for (String value : param.getSet()) {
-						for (Action next : discreteSet) {
-							Action nextDiscrete = new Action(next);
-							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
-								if (paramToUpdate.equals(param)) {
-									paramToUpdate.setValue(value);
-								}
-							}
-							tmpSet.add(nextDiscrete);
-						}
-					}
-				} else if (param.getType().equals(ParameterType.INT)) {
-					for (int value = (int) param.getMin(); value < param.getMax(); value++) {
-						for (Action next : discreteSet) {
-							Action nextDiscrete = new Action(next);
-							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
-								if (paramToUpdate.equals(param)) {
-									paramToUpdate.setValue(String.valueOf(value));
-								}
-							}
-							tmpSet.add(nextDiscrete);
-						}
-					}
-				} else if (param.getType().equals(ParameterType.REAL)) {
-					double step = (param.getMax() - param.getMin()) / realStepForDiscretization;
-					for (double value = param.getMin(); value < param.getMax(); value += step) {
-						for (Action next : discreteSet) {
-							Action nextDiscrete = new Action(next);
-							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
-								if (paramToUpdate.equals(param)) {
-									paramToUpdate.setValue(String.valueOf(value));
-								}
-							}
-							tmpSet.add(nextDiscrete);
-						}
-					}
-				}
-
-				discreteSet = tmpSet;
-			}
-			discreteActions.addAll(discreteSet);
-		}
-
-		return discreteActions;
 	}
 
 	@Override

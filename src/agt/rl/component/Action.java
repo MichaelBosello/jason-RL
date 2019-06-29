@@ -2,11 +2,14 @@ package rl.component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Action implements Serializable{
 
 	private static final long serialVersionUID = 1L;
+	private static double realStepForDiscretization = 100;
 
 	public enum ParameterType {
 	    SET, REAL, INT
@@ -70,5 +73,60 @@ public class Action implements Serializable{
 	@Override
 	public String toString() {
 		return "Action [name=" + name + ", parameters=" + parameters + "]";
+	}
+	
+	public static List<Action> discretizeAction(Set<Action> parametrizedAction) {
+		List<Action> discreteActions = new ArrayList<>();
+
+		for (Action action : parametrizedAction) {
+			Set<Action> discreteSet = new HashSet<>();
+			discreteSet.add(action);
+			for (ActionParameter param : action.getParameters()) {
+				Set<Action> tmpSet = new HashSet<>();
+				if (param.getType().equals(ParameterType.SET)) {
+					for (String value : param.getSet()) {
+						for (Action next : discreteSet) {
+							Action nextDiscrete = new Action(next);
+							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
+								if (paramToUpdate.equals(param)) {
+									paramToUpdate.setValue(value);
+								}
+							}
+							tmpSet.add(nextDiscrete);
+						}
+					}
+				} else if (param.getType().equals(ParameterType.INT)) {
+					for (int value = (int) param.getMin(); value < param.getMax(); value++) {
+						for (Action next : discreteSet) {
+							Action nextDiscrete = new Action(next);
+							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
+								if (paramToUpdate.equals(param)) {
+									paramToUpdate.setValue(String.valueOf(value));
+								}
+							}
+							tmpSet.add(nextDiscrete);
+						}
+					}
+				} else if (param.getType().equals(ParameterType.REAL)) {
+					double step = (param.getMax() - param.getMin()) / realStepForDiscretization;
+					for (double value = param.getMin(); value < param.getMax(); value += step) {
+						for (Action next : discreteSet) {
+							Action nextDiscrete = new Action(next);
+							for (ActionParameter paramToUpdate : nextDiscrete.getParameters()) {
+								if (paramToUpdate.equals(param)) {
+									paramToUpdate.setValue(String.valueOf(value));
+								}
+							}
+							tmpSet.add(nextDiscrete);
+						}
+					}
+				}
+
+				discreteSet = tmpSet;
+			}
+			discreteActions.addAll(discreteSet);
+		}
+
+		return discreteActions;
 	}
 }

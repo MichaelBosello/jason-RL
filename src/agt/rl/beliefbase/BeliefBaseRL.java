@@ -138,6 +138,7 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 	public AlgorithmRL getRLInstance(String goal) {
 		if(!rlActive.contains(goal)) {
 			rl.get(goal).initialize(agentReference, this);
+			rlActive.add(goal);
 		}
 		return rl.get(goal);
 	}

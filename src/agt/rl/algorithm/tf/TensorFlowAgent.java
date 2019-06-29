@@ -13,7 +13,6 @@ import rl.algorithm.tf.rest.EnvironmentRest;
 import rl.algorithm.tf.rest.StateRest;
 import rl.beliefbase.BeliefBaseRL;
 import rl.component.Action;
-import rl.component.ActionParameter;
 import rl.component.Observation;
 import rl.component.ObservationParameter;
 import rl.component.PlanLibraryRL;
@@ -40,6 +39,7 @@ public class TensorFlowAgent implements AlgorithmRL{
 	
 	private List<Observation> observations;
 	private Map<String, Observation> observationsNameMap = new HashMap<>();
+	private List<Action> actions;
 	
 	public TensorFlowAgent(String goal) {
 		super();
@@ -60,9 +60,9 @@ public class TensorFlowAgent implements AlgorithmRL{
 			}
 		}
 		
-		List<List<Float>> currentState = observationsToTF(currentObservation);
+		List<Float> currentState = observationsToTF(currentObservation);
 		
-        StateRest<List<Float>> state = new StateRest<>();
+        StateRest<Float> state = new StateRest<>();
         state.setState(currentState);
         state.setState_type("float");
         state.setReward(reward);
@@ -72,10 +72,9 @@ public class TensorFlowAgent implements AlgorithmRL{
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(state, MediaType.APPLICATION_JSON));
 
-        @SuppressWarnings("rawtypes")
-		ActionRest actionRest = response.readEntity(ActionRest.class);
-        System.out.println(actionRest.getAction());
-		return null;
+        @SuppressWarnings("unchecked")
+		ActionRest<List<Integer>> actionRest = response.readEntity(ActionRest.class);
+		return actions.get(actionRest.getAction().get(0).get(0));
 	}
 
 	@Override
@@ -86,41 +85,24 @@ public class TensorFlowAgent implements AlgorithmRL{
 
 	@Override
 	public void initialize(Agent agent, BeliefBaseRL bb) {
-		EnvironmentRest<List<Integer>, List<Float>> environment = new EnvironmentRest<>();
+		
+		EnvironmentRest<Integer, Float> environment = new EnvironmentRest<>();
 		environment.setAgentType(method);
-		
-		
-		Set<Action> actions = PlanLibraryRL.getAllActionsForGoal(agent, goal);
+		//actions specification
+		actions = Action.discretizeAction(PlanLibraryRL.getAllActionsForGoal(agent, goal));
         
         environment.setA_type("int");
         List<Integer> a_shape = new ArrayList<>();
-    	List<List<Integer>> a_min = new ArrayList<>();
-    	List<List<Integer>> a_max = new ArrayList<>();
-    	
-    	for(Action action : actions) {
-    		a_shape.add(action.getParameters().size());
-    		List<Integer> a_minList = new ArrayList<>();
-    		List<Integer> a_maxList = new ArrayList<>();
-        	for(ActionParameter param : action.getParameters()) {
-        		if(param.getType() == Action.ParameterType.REAL) {
-        			a_minList.add(0);
-        			a_maxList.add(N_ACTION_REAL);
-        		} else if(param.getType() == Action.ParameterType.INT) {
-        			a_minList.add((int) param.getMin());
-        			a_maxList.add((int) param.getMax());
-        		} else if(param.getType() == Action.ParameterType.SET) {
-        			a_minList.add(0);
-        			a_maxList.add(param.getSet().size() - 1);
-        		}
-        	}
-        	a_min.add(a_minList);
-			a_max.add(a_maxList);
-    	}
+    	List<Integer> a_min = new ArrayList<>();
+    	List<Integer> a_max = new ArrayList<>();
+    	a_shape.add(1);
+    	a_min.add(0);
+    	a_max.add(actions.size() - 1);
     	environment.setA_shape(a_shape);
     	environment.setA_min(a_min);
     	environment.setA_max(a_max);
         
-        
+        //observations specification
 		Set<Term> observationsTerm = bb.getObservedList(goal);
 		observations = new ArrayList<>();
 		for(Term observation : observationsTerm) {
@@ -131,27 +113,27 @@ public class TensorFlowAgent implements AlgorithmRL{
         
 		environment.setO_type("float");
         List<Integer> o_shape = new ArrayList<>();
-    	List<List<Float>> o_min = new ArrayList<>();
-    	List<List<Float>> o_max = new ArrayList<>();
+    	List<Float> o_min = new ArrayList<>();
+    	List<Float> o_max = new ArrayList<>();
 		for(Observation observation : observations) {
-			o_shape.add(observation.getParameters().size());
-    		List<Float> o_minList = new ArrayList<>();
-    		List<Float> o_maxList = new ArrayList<>();
+			if(observation.getParameters().size() == 0) {
+				o_min.add(0f);
+    			o_max.add(1f);
+			} else
         	for(ObservationParameter param : observation.getParameters()) {
         		if(param.getType() == Observation.ParameterType.REAL) {
-        			o_minList.add((float) param.getMin());
-        			o_maxList.add((float) param.getMax());
+        			o_min.add((float) param.getMin());
+        			o_max.add((float) param.getMax());
         		} else if(param.getType() == Observation.ParameterType.INT) {
-        			o_minList.add((float) param.getMin());
-        			o_maxList.add((float) param.getMax());
+        			o_min.add((float) param.getMin());
+        			o_max.add((float) param.getMax());
         		} else if(param.getType() == Observation.ParameterType.SET) {
-        			o_minList.add(0.0f);
-        			o_maxList.add((float) param.getSet().size() - 1);
+        			o_min.add(0.0f);
+        			o_max.add((float) param.getSet().size() - 1);
         		}
         	}
-        	o_min.add(o_minList);
-			o_max.add(o_maxList);
     	}
+		o_shape.add(o_min.size());
 		environment.setO_shape(o_shape);
     	environment.setO_min(o_min);
     	environment.setO_max(o_max);
@@ -159,7 +141,7 @@ public class TensorFlowAgent implements AlgorithmRL{
     	
         environment.setInit_state(observationsToTF(bb.getCurrentObservation(goal)));
 		
-		
+		//parameters
 		Map<Term, Term> parameters = bb.getRlParameter();
 		Map<String, String> parametersString = new HashMap<>();
 		for(Entry<Term, Term> param : parameters.entrySet()) {
@@ -174,25 +156,34 @@ public class TensorFlowAgent implements AlgorithmRL{
 		
 	}
 	
-	protected List<List<Float>> observationsToTF(Set<Literal> observationsLiteral){
+	protected List<Float> observationsToTF(Set<Literal> observationsLiteral){
+		List<Observation> currentGround = new ArrayList<>();
 		for(Term observation : observationsLiteral) {
 			String observationName = ((Literal) observation).getFunctor();
 			Observation o = observationsNameMap.get(observationName);
 			o.setParamValues(observation);
+			if(o.getParameters().size() == 0) {
+				currentGround.add(o);
+			}
 		}
-        List<List<Float>> stateTF = new ArrayList<>();
+        List<Float> stateTF = new ArrayList<>();
         for(Observation observation : observations) {
-        	List<Float> obs = new ArrayList<>();
+        	if(observation.getParameters().size() == 0) {
+        		if(currentGround.contains(observation)){
+        			stateTF.add(1f);
+        		} else {
+        			stateTF.add(0f);
+        		}
+			} else
         	for(ObservationParameter param : observation.getParameters()) {
         		if(param.getType() == Observation.ParameterType.REAL) {
-        			obs.add(Float.parseFloat(param.getValue()));
+        			stateTF.add(Float.parseFloat(param.getValue()));
         		} else if(param.getType() == Observation.ParameterType.INT) {
-        			obs.add(Float.parseFloat(param.getValue()));
+        			stateTF.add(Float.parseFloat(param.getValue()));
         		} else if(param.getType() == Observation.ParameterType.SET) {
-        			obs.add((float) param.getSet().indexOf(param.getValue()));
+        			stateTF.add((float) param.getSet().indexOf(param.getValue()));
         		}
         	}
-        	stateTF.add(obs);
         }
         return stateTF;
 	} 
