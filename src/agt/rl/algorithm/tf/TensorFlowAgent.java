@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class TensorFlowAgent implements AlgorithmRL{
+public abstract class TensorFlowAgent implements AlgorithmRL{
 	
 	public static String TARGET = "http://localhost:5002/env/";
 	public static String COLLECT_POLICY = "/next_train_action";
@@ -34,23 +34,24 @@ public class TensorFlowAgent implements AlgorithmRL{
 	
 	public static int N_ACTION_REAL = 10;
 	
-	protected String method = "dqn";
+	protected abstract String getMethod();
 	private String goal;
 	
 	private List<Observation> observations;
 	private Map<String, Observation> observationsNameMap = new HashMap<>();
 	private List<Action> actions;
 	
+	private Client client = ClientBuilder.newClient();
+	
 	public TensorFlowAgent(String goal) {
 		super();
 		this.goal = goal;
 	}
 
-	Client client = ClientBuilder.newClient();
-
 	@Override
 	public Action nextAction(Map<Term, Term> parameters, Set<Action> action, Set<Literal> currentObservation,
 			double reward, boolean isTerminal) {
+		
 		String policy = COLLECT_POLICY;
 		for(Entry<Term, Term> parameter : parameters.entrySet()) {
 			if(parameter.getKey().toString().equals(POLICY_FUNCTOR)) {
@@ -87,7 +88,7 @@ public class TensorFlowAgent implements AlgorithmRL{
 	public void initialize(Agent agent, BeliefBaseRL bb) {
 		
 		EnvironmentRest<Integer, Float> environment = new EnvironmentRest<>();
-		environment.setAgentType(method);
+		environment.setAgentType(getMethod());
 		//actions specification
 		actions = Action.discretizeAction(PlanLibraryRL.getAllActionsForGoal(agent, goal));
         
@@ -138,7 +139,7 @@ public class TensorFlowAgent implements AlgorithmRL{
     	environment.setO_min(o_min);
     	environment.setO_max(o_max);
 		
-    	
+    	//initial state
         environment.setInit_state(observationsToTF(bb.getCurrentObservation(goal)));
 		
 		//parameters

@@ -1,4 +1,4 @@
-rl_algorithm(reach_finish, dqn).
+rl_algorithm(reach_finish, sarsa).
 
 rl_parameter(policy, egreedy).
 rl_parameter(alpha, 0.26).
@@ -7,7 +7,7 @@ rl_parameter(epsilon, 0.22).
 rl_parameter(epsilon_decay, 0.99992).
 rl_parameter(epsilon_min, 0.001).
 
-rl_observe(reach_finish, pos(int(0, 4), int(0, 4))).
+rl_observe(reach_finish, pos).
 
 rl_reward(reach_finish, 10) :- finishline.
 rl_reward(reach_finish, -1) :- not finishline.

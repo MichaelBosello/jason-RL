@@ -17,7 +17,7 @@ import simulation.EpisodicSimulation;
 
 public class GridWorldEnv extends Artifact {
 
-	public static final int GRID_SIZE = 5;
+	public static final int GRID_SIZE = 10;
 	public static final int FINISH_LINE = 16; // finsh line code in grid model
 
 	private static final boolean SHOW_VIEW = false;

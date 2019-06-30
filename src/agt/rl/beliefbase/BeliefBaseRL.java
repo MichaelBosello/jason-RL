@@ -12,7 +12,7 @@ import jason.asSyntax.Term;
 import jason.bb.DefaultBeliefBase;
 import rl.algorithm.AlgorithmRL;
 import rl.algorithm.Sarsa;
-import rl.algorithm.tf.TensorFlowAgent;
+import rl.algorithm.tf.Dqn;
 
 public class BeliefBaseRL extends DefaultBeliefBase {
 
@@ -70,20 +70,18 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 					System.out.println("Goal " + goal + " tracks all");
 				} else if (observe.isList()) {
 					((ListTerm) observe).forEach(o -> {
-						String oString = o.toString();
-						String observationFunctor = oString;
-						if(oString.contains("(")) {
-							observationFunctor = oString.substring(0, oString.indexOf("("));
+						String observationFunctor = o.toString();
+						if(observationFunctor.contains("(")) {
+							observationFunctor = observationFunctor.substring(0, observationFunctor.indexOf("("));
 						}
 						putMapSet(goalObservationTerm, goal, o);
 						putMapSet(goalObservation, goal, observationFunctor);
 						System.out.println("Observe " + observationFunctor + " for goal " + goal);
 					});
 				} else {
-					String oString = observe.toString();
-					String observationFunctor = oString;
-					if(oString.contains("(")) {
-						observationFunctor = oString.substring(0, oString.indexOf("("));
+					String observationFunctor = observe.toString();
+					if(observationFunctor.contains("(")) {
+						observationFunctor = observationFunctor.substring(0, observationFunctor.indexOf("("));
 					}
 					putMapSet(goalObservationTerm, goal, observe);
 					putMapSet(goalObservation, goal, observationFunctor);
@@ -96,7 +94,7 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 				String algorithm = belief.getTerm(1).toString();
 				if(!rl.containsKey(goal)) {
 					if(algorithm.equals(DQN_ID)) {
-						rl.put(goal, new TensorFlowAgent(goal));
+						rl.put(goal, new Dqn(goal));
 					} else if(algorithm.equals(SARSA_ID)) {
 						rl.put(goal, new Sarsa());
 					} else {
@@ -113,7 +111,6 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 		}
 		map.get(key).add(value);
 	}
-
 	
 	public Set<Literal> getCurrentObservation(String goal) {
 		Set<Literal> currentObservation = new HashSet<>();// goal, current observation list
