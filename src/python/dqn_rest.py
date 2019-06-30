@@ -40,7 +40,8 @@ class Env(Resource):
         array_spec.BoundedArraySpec(
           shape=json_data['o_shape'], dtype=o_type,
           minimum=json_data['o_min'], maximum=json_data['o_max'], name='observation'),
-          np.array(json_data['init_state'], dtype=o_type))
+          np.array(json_data['init_state'], dtype=o_type),
+        json_data['parameters'])
       envs[env] = dqn
 
 class Action(Resource):

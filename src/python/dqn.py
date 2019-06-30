@@ -3,6 +3,7 @@ import IPython
 import tensorflow as tf
 import numpy as np
 import random
+import ast
 
 from tf_agents.agents.dqn import dqn_agent
 from tf_agents.environments import suite_gym
@@ -19,17 +20,17 @@ from generic_environment import GenericEnv
 tf.compat.v1.enable_v2_behavior()
 
 class DQN():
-  def __init__(self, action_specification, observation_specification, initial_state):
+  def __init__(self, action_specification, observation_specification, initial_state, params={}):
     #params
-    self.replay_buffer_capacity = 100000  # @param
-    self.fc_layer_params = (25, )  # @param
-    self.initial_collect_steps = 100  # @param
-    self.collect_steps_per_iteration = 0  # @param
-    self.batch_size = 32  # @param
-    self.learning_rate = 1e-5  # @param
-    self.epsilon=0.3
-    self.epsilon_decay=0.99999
-    self.gamma = 0.95
+    self.replay_buffer_capacity = int(params.get('replay_buffer_capacity', 100000))
+    self.fc_layer_params = ast.literal_eval(params.get('fc_layer_params', '(25, )'))
+    self.initial_collect_steps = int(params.get('initial_collect_steps', 100))
+    self.collect_steps_per_iteration = int(params.get('collect_steps_per_iteration', 0))
+    self.batch_size = int(params.get('batch_size', 32))
+    self.learning_rate = float(params.get('learning_rate', 1e-5))
+    self.epsilon = float(params.get('epsilon', 0.3))
+    self.epsilon_decay = float(params.get('epsilon_decay', 0.99999))
+    self.gamma = float(params.get('gamma', 0.95))
     #env
     self.train_py_env = GenericEnv(action_specification, observation_specification, initial_state)
     self.env = tf_py_environment.TFPyEnvironment(self.train_py_env)
