@@ -13,7 +13,7 @@ public class EnvironmentRest<ActionType, ObservationType> {
     private List<ObservationType> o_min;
     private List<ObservationType> o_max;
     private List<ObservationType> init_state;
-    private String agentType;
+    private String agent_type;
     private Map<String, String> parameters;
 
     public List<Integer> getA_shape() {
@@ -88,12 +88,12 @@ public class EnvironmentRest<ActionType, ObservationType> {
         this.init_state = init_state;
     }
 
-	public String getAgentType() {
-		return agentType;
+	public String getAgent_type() {
+		return agent_type;
 	}
 
-	public void setAgentType(String agentType) {
-		this.agentType = agentType;
+	public void setAgent_type(String agent_type) {
+		this.agent_type = agent_type;
 	}
 
 	public Map<String, String> getParameters() {
