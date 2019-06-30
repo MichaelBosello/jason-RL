@@ -60,6 +60,10 @@ task run (type: JavaExec, dependsOn: 'classes') {
     classpath sourceSets.main.runtimeClasspath
 }
 
+task runPython(type:Exec) {
+   workingDir 'src/python'
+   commandLine 'python3', 'dqn_rest.py'
+} 
 
 task uberJar(type: Jar, dependsOn: 'classes') {
     group      ' JaCaMo'
