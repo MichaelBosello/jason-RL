@@ -21,9 +21,26 @@ As a reference example, we provide an agent and an environment for the GridWorld
 + The agent must reach a target block doing the minimum number of steps
 
 # Quick start
-Use the eclipse JaCaMo plugin to execute gridworld.
-<http://jacamo.sourceforge.net/doc/install.html>
+To run the agent system:
 
+	./gradlew run
+
+If you use an algorithm implemented in python, you must run the python server _before_ the agent system
+*Check the dependencies below*
+You can run the python service with the apposite gradle task:
+
+	./gradlew runPython
+
+_or_ with the python command (from the directory src/python):
+
+	python3 tf_agent_rest.py
+
+## Python dependencies
+You must install python 3 (System tested on version 3.7.3) along with the following dependencies:
+
+	pip3 install tf-agents-nightly
+	pip3 install tf-nightly
+	pip3 install flask flask-jsonpify flask-restful
 # Configuration
 ## Algorithm Parameters
 You can change the parameters with the agent beliefs.

@@ -62,7 +62,7 @@ task run (type: JavaExec, dependsOn: 'classes') {
 
 task runPython(type:Exec) {
    workingDir 'src/python'
-   commandLine 'python3', 'dqn_rest.py'
+   commandLine 'python3', 'tf_agent_rest.py'
 } 
 
 task uberJar(type: Jar, dependsOn: 'classes') {
