@@ -13,6 +13,7 @@ import jason.bb.DefaultBeliefBase;
 import rl.algorithm.AlgorithmRL;
 import rl.algorithm.Sarsa;
 import rl.algorithm.tf.Dqn;
+import rl.algorithm.tf.Reinforce;
 
 public class BeliefBaseRL extends DefaultBeliefBase {
 
@@ -22,6 +23,7 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 	
 	public static final String DQN_ID = "dqn";
 	public static final String SARSA_ID = "sarsa";
+	public static final String REINFORCE_ID = "reinforce";
 
 	Agent agentReference;
 
@@ -95,6 +97,8 @@ public class BeliefBaseRL extends DefaultBeliefBase {
 				if(!rl.containsKey(goal)) {
 					if(algorithm.equals(DQN_ID)) {
 						rl.put(goal, new Dqn(goal));
+					} else if(algorithm.equals(REINFORCE_ID)) {
+						rl.put(goal, new Reinforce(goal));
 					} else if(algorithm.equals(SARSA_ID)) {
 						rl.put(goal, new Sarsa());
 					} else {

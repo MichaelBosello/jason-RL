@@ -14,7 +14,7 @@
 
 mas jacamoRL {
 
-    agent rlagent : dqn_agent.asl {
+    agent rlagent : reinforce_agent.asl {
     	ag-bb-class: rl.beliefbase.BeliefBaseRL	
     	focus: gridworld.grid
     	verbose: 0

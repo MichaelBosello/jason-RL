@@ -6,7 +6,8 @@ import json
 import numpy as np
 from tf_agents.specs import array_spec
 
-from dqn import DQN
+from dqn_agent import DqnAgent
+from reinforce_agent import ReinforceAgent
 
 app = Flask(__name__)
 app.debug = False
@@ -33,16 +34,27 @@ class Env(Resource):
         o_type = np.int32
       if json_data['o_type'] == "float":
         o_type = np.float
-      dqn = DQN(
-        array_spec.BoundedArraySpec(
-          shape=json_data['a_shape'], dtype=a_type,
-          minimum=json_data['a_min'], maximum=json_data['a_max'], name='action'),
-        array_spec.BoundedArraySpec(
-          shape=json_data['o_shape'], dtype=o_type,
-          minimum=json_data['o_min'], maximum=json_data['o_max'], name='observation'),
-          np.array(json_data['init_state'], dtype=o_type),
-        json_data['parameters'])
-      envs[env] = dqn
+      if json_data['agent_type'] == "dqn":
+        agent = DqnAgent(
+          array_spec.BoundedArraySpec(
+            shape=json_data['a_shape'], dtype=a_type,
+            minimum=json_data['a_min'], maximum=json_data['a_max'], name='action'),
+          array_spec.BoundedArraySpec(
+            shape=json_data['o_shape'], dtype=o_type,
+            minimum=json_data['o_min'], maximum=json_data['o_max'], name='observation'),
+            np.array(json_data['init_state'], dtype=o_type),
+          json_data['parameters'])
+      if json_data['agent_type'] == "reinforce":
+        agent = ReinforceAgent(
+          array_spec.BoundedArraySpec(
+            shape=json_data['a_shape'], dtype=a_type,
+            minimum=json_data['a_min'], maximum=json_data['a_max'], name='action'),
+          array_spec.BoundedArraySpec(
+            shape=json_data['o_shape'], dtype=o_type,
+            minimum=json_data['o_min'], maximum=json_data['o_max'], name='observation'),
+            np.array(json_data['init_state'], dtype=o_type),
+          json_data['parameters'])
+      envs[env] = agent
 
 class Action(Resource):
   def post(self, env, action_type):
