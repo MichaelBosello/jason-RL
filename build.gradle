@@ -60,8 +60,8 @@ task run (type: JavaExec, dependsOn: 'classes') {
     classpath sourceSets.main.runtimeClasspath
 }
 
-task runPython(type:Exec) {
-   workingDir 'src/python'
+task runPythonAgent(type:Exec) {
+   workingDir 'src/python/agt'
    commandLine 'python3', 'tf_agent_rest.py'
 } 
 

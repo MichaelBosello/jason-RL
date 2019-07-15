@@ -29,9 +29,10 @@ If you use an algorithm implemented in python, you must run the python server _b
 *Check the dependencies below*
 You can run the python service with the apposite gradle task:
 
-	./gradlew runPython
+	./gradlew --stop
+	./gradlew runPythonAgent
 
-_or_ with the python command (from the directory src/python):
+_or_ with the python command (from the directory src/python/agt):
 
 	python3 tf_agent_rest.py
 
