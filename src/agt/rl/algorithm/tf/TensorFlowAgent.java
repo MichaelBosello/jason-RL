@@ -26,7 +26,7 @@ import java.util.Set;
 
 public abstract class TensorFlowAgent implements AlgorithmRL{
 	
-	public static String TARGET = "http://localhost:5002/env/";
+	public static String TARGET = "http://localhost:5002/agent/";
 	public static String COLLECT_POLICY = "/next_train_action";
 	public static String GREEDY_POLICY = "/next_best_action";
 	public static String POLICY_FUNCTOR = "policy";

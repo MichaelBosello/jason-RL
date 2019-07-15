@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
-from sqlalchemy import create_engine
 import json
 
 import numpy as np
@@ -18,11 +17,11 @@ import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-envs = {}
+agents = {}
 
 class Env(Resource):
-  def post(self, env):
-    if not env in envs:
+  def post(self, id):
+    if not id in agents:
       json_data = request.get_json(force=True)
       print("##################################")
       print(json_data)
@@ -54,20 +53,20 @@ class Env(Resource):
             minimum=json_data['o_min'], maximum=json_data['o_max'], name='observation'),
             np.array(json_data['init_state'], dtype=o_type),
           json_data['parameters'])
-      envs[env] = agent
+      agents[id] = agent
 
 class Action(Resource):
-  def post(self, env, action_type):
+  def post(self, id, action_type):
     json_data = request.get_json(force=True)
     #print("##################################")
     #print(json_data)
     if action_type == "next_train_action":
-      action_step = envs[env].get_train_action()
+      action_step = agents[id].get_train_action()
     if action_type == "next_best_action":
-      action_step = envs[env].get_greedy_action()
+      action_step = agents[id].get_greedy_action()
 
     action = action_step.action.numpy()
-    envs[env].update(np.array(json_data['state'], dtype=json_data['state_type']),
+    agents[id].update(np.array(json_data['state'], dtype=json_data['state_type']),
       json_data['reward'], json_data['is_terminal'], action_step)
 
     action_list = action.tolist()
@@ -77,8 +76,8 @@ class Action(Resource):
     #print(result)
     return jsonify(result)
 
-api.add_resource(Env, '/env/<string:env>')
-api.add_resource(Action, '/env/<string:env>/<string:action_type>')
+api.add_resource(Env, '/agent/<string:id>')
+api.add_resource(Action, '/agent/<string:id>/<string:action_type>')
 
 if __name__ == '__main__':
      app.run(port='5002')
