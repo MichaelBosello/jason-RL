@@ -65,6 +65,11 @@ task runPythonAgent(type:Exec) {
    commandLine 'python3', 'tf_agent_rest.py'
 } 
 
+task runPythonEnv(type:Exec) {
+   workingDir 'src/python/env'
+   commandLine 'python3', 'tf_env_rest.py'
+} 
+
 task uberJar(type: Jar, dependsOn: 'classes') {
     group      ' JaCaMo'
     description 'creates a single runnable jar file with all dependencies'

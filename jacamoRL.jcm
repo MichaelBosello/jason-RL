@@ -14,14 +14,14 @@
 
 mas jacamoRL {
 
-    agent rlagent : reinforce_agent.asl {
+    agent rlagent : dqn_agent.asl {
     	ag-bb-class: rl.beliefbase.BeliefBaseRL	
-    	focus: gridworld.grid
+    	focus: cartpole.cp
     	verbose: 0
     }
     
-    workspace gridworld {
-        artifact grid: gridworld.GridWorldEnv()
+    workspace cartpole {
+        artifact cp: gym.Cartpole()
     }
 
 }
