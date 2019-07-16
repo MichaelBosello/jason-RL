@@ -26,7 +26,7 @@ class Env(Resource):
 
     result = {'state': envs[id].get_current_time_step().observation.tolist(),
               'reward' : envs[id].get_current_time_step().reward.tolist(),
-              'is_terminal' : bool(envs[id].get_current_time_step().is_last())}
+              'terminal' : bool(envs[id].get_current_time_step().is_last())}
     print("##################################")
     print('starting state', result)
     return jsonify(result)
@@ -39,7 +39,7 @@ class Action(Resource):
     next_step = envs[id].step(int(action))
     result = {'state': next_step.observation.tolist(),
               'reward' : next_step.reward.tolist(),
-              'is_terminal' : bool(next_step.is_last())}
+              'terminal' : bool(next_step.is_last())}
     #print("##################################")
     #print(result)
     return jsonify(result)
