@@ -39,44 +39,43 @@ public class Cartpole extends Artifact{
 
 	@OPERATION
 	public void move(String move) {
+		if (SHOW_VIEW) { 
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+		}
 
-			if (SHOW_VIEW) { 
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {}
-			}
-			
-			StateRest<Double> state;
-			if (move.equals("right")) {
-				state = cartpole.step(1);
-			} else {
-				state = cartpole.step(0);
-			}
-			
-			episodeReward += state.getReward();
-			if(state.isTerminal()) {
-				if(episodeEvaluation > 0) {
-					episodeEvaluation--;
-					evaluationRewards += episodeReward;
-					if(episodeEvaluation == 0) {
-						logger.episodeEnd(evaluationRewards/EVALUATION_EPISODES);
-						evaluationRewards = 0;
-						
-						ObsProperty policy = getObsProperty("rl_parameter");
-						policy.updateValue(1, "egreedy");
-					}
-				} else {
-					trainEpisodeCount++;
-					if(trainEpisodeCount % EVALUATION_INTERVAL == 0) {
-						ObsProperty policy = getObsProperty("rl_parameter");
-						policy.updateValue(1, "greedy");
-						episodeEvaluation = EVALUATION_EPISODES;
-					}
+		StateRest<Double> state;
+		if (move.equals("right")) {
+			state = cartpole.step(1);
+		} else {
+			state = cartpole.step(0);
+		}
+
+		episodeReward += state.getReward();
+		if(state.isTerminal()) {
+			if(episodeEvaluation > 0) {
+				episodeEvaluation--;
+				evaluationRewards += episodeReward;
+				if(episodeEvaluation == 0) {
+					logger.episodeEnd(evaluationRewards/EVALUATION_EPISODES);
+					evaluationRewards = 0;
+
+					ObsProperty policy = getObsProperty("rl_parameter");
+					policy.updateValue(1, "egreedy");
 				}
-				episodeReward = 0;
+			} else {
+				trainEpisodeCount++;
+				if(trainEpisodeCount % EVALUATION_INTERVAL == 0) {
+					ObsProperty policy = getObsProperty("rl_parameter");
+					policy.updateValue(1, "greedy");
+					episodeEvaluation = EVALUATION_EPISODES;
+				}
 			}
-			
-			updatePercepts(state);
+			episodeReward = 0;
+		}
+
+		updatePercepts(state);
 	}
 	
 	private void updatePercepts(StateRest<Double> state) {
