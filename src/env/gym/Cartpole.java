@@ -10,6 +10,8 @@ import gym.rest.GymRest;
 import gym.rest.StateRest;
 import simulation.EpisodicSimulation;
 
+import jason.asSyntax.Atom;
+
 public class Cartpole extends Artifact{
 	
 	private static final boolean SHOW_VIEW = false;
@@ -34,7 +36,7 @@ public class Cartpole extends Artifact{
 		defineObsProperty("pole_position", state.getState().get(2));
 		defineObsProperty("pole_velocity", state.getState().get(3));
 		
-		defineObsProperty("rl_parameter", "policy", "egreedy");
+		defineObsProperty("rl_parameter", new Atom("policy"), new Atom("egreedy"));
 	}
 
 	@OPERATION
@@ -62,13 +64,13 @@ public class Cartpole extends Artifact{
 					evaluationRewards = 0;
 
 					ObsProperty policy = getObsProperty("rl_parameter");
-					policy.updateValue(1, "egreedy");
+					policy.updateValue(1, new Atom("egreedy"));
 				}
 			} else {
 				trainEpisodeCount++;
 				if(trainEpisodeCount % EVALUATION_INTERVAL == 0) {
 					ObsProperty policy = getObsProperty("rl_parameter");
-					policy.updateValue(1, "greedy");
+					policy.updateValue(1, new Atom("greedy"));
 					episodeEvaluation = EVALUATION_EPISODES;
 				}
 			}
