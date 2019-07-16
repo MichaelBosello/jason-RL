@@ -30,4 +30,9 @@ public class StateRest<T> {
     public void setTerminal(boolean terminal) {
         this.terminal = terminal;
     }
+
+	@Override
+	public String toString() {
+		return "StateRest [state=" + state + ", reward=" + reward + ", terminal=" + terminal + "]";
+	}
 }

@@ -3,8 +3,8 @@ rl_algorithm(cartpole, dqn).
 rl_parameter(policy, egreedy).
 rl_parameter(learning_rate, 0.001).
 rl_parameter(gamma, 1).
-rl_parameter(epsilon, 0.3).
-rl_parameter(epsilon_decay, 0.99999).
+rl_parameter(epsilon, 0.1).
+rl_parameter(epsilon_decay, 1).
 rl_parameter(batch_size, 64).
 rl_parameter(fc_layer_params, '(100, )').
 

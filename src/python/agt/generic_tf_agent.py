@@ -26,7 +26,7 @@ class GenericTfAgent(ABC):
     self.collect_steps_per_iteration = int(params.get('collect_steps_per_iteration', 1))
     self.batch_size = int(params.get('batch_size', 64))
     self.learning_rate = float(params.get('learning_rate', 1e-3))
-    self.epsilon = float(params.get('epsilon', 0.3))
+    self.epsilon = float(params.get('epsilon', 0.1))
     self.epsilon_decay = float(params.get('epsilon_decay', 0.99999))
     self.gamma = float(params.get('gamma', 1))
     #env

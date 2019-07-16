@@ -8,62 +8,93 @@ import cartago.OPERATION;
 import cartago.ObsProperty;
 import gym.rest.GymRest;
 import gym.rest.StateRest;
+import simulation.EpisodicSimulation;
 
 public class Cartpole extends Artifact{
 	
 	private static final boolean SHOW_VIEW = false;
-	private static final int EVALUATION_INTERVAL = 1000;
+	private static final int EVALUATION_INTERVAL = 100;
 	private static final int EVALUATION_EPISODES = 10;
 	
 	GymRest<Double> cartpole = new GymRest<>();
 	
+	private EpisodicSimulation logger = new EpisodicSimulation(true);
+	private int trainEpisodeCount = 0;
+	private int episodeReward = 0;
+	private int episodeEvaluation = 0;
+	private double evaluationRewards = 0;
+	
 	@OPERATION
 	public void init() {
 		Map<String, String> parameters = new HashMap<>();
-		parameters.put("eval_interval", Integer.toString(EVALUATION_INTERVAL));
-		parameters.put("num_eval_episodes", Integer.toString(EVALUATION_EPISODES));
 		parameters.put("show_gui", Boolean.toString(SHOW_VIEW));
 		StateRest<Double> state = cartpole.initialize("CartPole-v0", parameters);
 		defineObsProperty("cart_position", state.getState().get(0));
 		defineObsProperty("cart_velocity", state.getState().get(1));
 		defineObsProperty("pole_position", state.getState().get(2));
 		defineObsProperty("pole_velocity", state.getState().get(3));
+		
+		defineObsProperty("rl_parameter", "policy", "egreedy");
 	}
 
 	@OPERATION
 	public void move(String move) {
 
-		if (SHOW_VIEW) {
-			try {
-				Thread.sleep(50);
-			} catch (Exception e) {}
-		}
-
-		try {
+			if (SHOW_VIEW) { 
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {}
+			}
+			
 			StateRest<Double> state;
 			if (move.equals("right")) {
 				state = cartpole.step(1);
 			} else {
 				state = cartpole.step(0);
 			}
-			ObsProperty cart_position = getObsProperty("cart_position");
-			cart_position.updateValue(0, state.getState().get(0));
-			ObsProperty cart_velocity = getObsProperty("cart_velocity");
-			cart_velocity.updateValue(0, state.getState().get(1));
-			ObsProperty pole_position = getObsProperty("pole_position");
-			pole_position.updateValue(0, state.getState().get(2));
-			ObsProperty pole_velocity = getObsProperty("pole_velocity");
-			pole_velocity.updateValue(0, state.getState().get(3));
-			if (state.isTerminal()) {
-				if (!hasObsProperty("gameover"))
-					defineObsProperty("gameover");
-			} else {
-				try {
-					removeObsProperty("gameover");
-				} catch (IllegalArgumentException e) {}
+			
+			episodeReward += state.getReward();
+			if(state.isTerminal()) {
+				if(episodeEvaluation > 0) {
+					episodeEvaluation--;
+					evaluationRewards += episodeReward;
+					if(episodeEvaluation == 0) {
+						logger.episodeEnd(evaluationRewards/EVALUATION_EPISODES);
+						evaluationRewards = 0;
+						
+						ObsProperty policy = getObsProperty("rl_parameter");
+						policy.updateValue(1, "egreedy");
+					}
+				} else {
+					trainEpisodeCount++;
+					if(trainEpisodeCount % EVALUATION_INTERVAL == 0) {
+						ObsProperty policy = getObsProperty("rl_parameter");
+						policy.updateValue(1, "greedy");
+						episodeEvaluation = EVALUATION_EPISODES;
+					}
+				}
+				episodeReward = 0;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			
+			updatePercepts(state);
+	}
+	
+	private void updatePercepts(StateRest<Double> state) {
+		ObsProperty cart_position = getObsProperty("cart_position");
+		cart_position.updateValue(0, state.getState().get(0));
+		ObsProperty cart_velocity = getObsProperty("cart_velocity");
+		cart_velocity.updateValue(0, state.getState().get(1));
+		ObsProperty pole_position = getObsProperty("pole_position");
+		pole_position.updateValue(0, state.getState().get(2));
+		ObsProperty pole_velocity = getObsProperty("pole_velocity");
+		pole_velocity.updateValue(0, state.getState().get(3));
+		if (state.isTerminal()) {
+			if (!hasObsProperty("gameover"))
+				defineObsProperty("gameover");
+		} else {
+			try {
+				removeObsProperty("gameover");
+			} catch (IllegalArgumentException e) {}
 		}
 	}
 }
