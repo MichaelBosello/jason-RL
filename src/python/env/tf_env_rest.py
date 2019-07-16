@@ -24,9 +24,11 @@ class Env(Resource):
       env = GenericTfEnv(json_data['name'], json_data['parameters'])
       envs[id] = env
 
-    result = {'state': envs[id].get_current_time_step() }
+    result = {'state': envs[id].get_current_time_step().observation.tolist(),
+              'reward' : envs[id].get_current_time_step().reward.tolist(),
+              'is_terminal' : bool(envs[id].get_current_time_step().is_last())}
     print("##################################")
-    print(result)
+    print('starting state', result)
     return jsonify(result)
 
 class Action(Resource):
@@ -34,7 +36,10 @@ class Action(Resource):
     json_data = request.get_json(force=True)
     #print("##################################")
     #print(json_data)
-    result = {'state': envs[id].step(action)}
+    next_step = envs[id].step(int(action))
+    result = {'state': next_step.observation.tolist(),
+              'reward' : next_step.reward.tolist(),
+              'is_terminal' : bool(next_step.is_last())}
     #print("##################################")
     #print(result)
     return jsonify(result)

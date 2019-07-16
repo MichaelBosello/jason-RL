@@ -30,6 +30,7 @@ class DqnAgent(GenericTfAgent):
       if self.episode_steps >= self.collect_steps_per_iteration:
         experience, unused_info = next(self.iterator)
         train_loss = self.tf_agent.train(experience)
+        #print('train loss ', train_loss)
         self.episode_steps = 0
       else:
         self.episode_steps = self.episode_steps + 1

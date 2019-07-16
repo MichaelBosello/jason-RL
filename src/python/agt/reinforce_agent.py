@@ -27,5 +27,6 @@ class ReinforceAgent(GenericTfAgent):
     if self.episode_counter >= self.collect_steps_per_iteration - 1:
         experience = self.replay_buffer.gather_all()
         train_loss = self.tf_agent.train(experience)
+        #print('train loss ', train_loss)
         self.replay_buffer.clear()
         self.episode_counter = 0

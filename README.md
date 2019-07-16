@@ -40,7 +40,9 @@ _or_ with the python command (from the directory src/python/agt):
 You must install python 3 (System tested on version 3.7.3) along with the following dependencies:
 
 	pip3 install tf-agents-nightly
-	pip3 install tf-nightly
+	pip3 install tensorflow==2.0.0-beta1
+	pip install 'gym==0.10.11'
+	pip3 install IPython
 	pip3 install flask flask-jsonpify flask-restful
 # Configuration
 ## Algorithm Parameters
