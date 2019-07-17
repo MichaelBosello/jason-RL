@@ -26,6 +26,8 @@ public class Cartpole extends Artifact{
 	private int episodeEvaluation = 0;
 	private double evaluationRewards = 0;
 	
+	private int step = 0;
+	
 	@OPERATION
 	public void init() {
 		Map<String, String> parameters = new HashMap<>();
@@ -49,9 +51,9 @@ public class Cartpole extends Artifact{
 
 		StateRest<Double> state;
 		if (move.equals("right")) {
-			state = cartpole.step(1);
-		} else {
 			state = cartpole.step(0);
+		} else {
+			state = cartpole.step(1);
 		}
 
 		episodeReward += state.getReward();
@@ -72,11 +74,14 @@ public class Cartpole extends Artifact{
 					ObsProperty policy = getObsProperty("rl_parameter");
 					policy.updateValue(1, new Atom("greedy"));
 					episodeEvaluation = EVALUATION_EPISODES;
+					
+					System.out.println("step " + step);
 				}
 			}
 			episodeReward = 0;
 		}
-
+		
+		step++;
 		updatePercepts(state);
 	}
 	

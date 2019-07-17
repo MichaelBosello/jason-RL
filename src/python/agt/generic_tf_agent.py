@@ -27,7 +27,7 @@ class GenericTfAgent(ABC):
     self.batch_size = int(params.get('batch_size', 64))
     self.learning_rate = float(params.get('learning_rate', 1e-3))
     self.epsilon = float(params.get('epsilon', 0.1))
-    self.epsilon_decay = float(params.get('epsilon_decay', 0.99999))
+    self.epsilon_decay = float(params.get('epsilon_decay', 1))
     self.gamma = float(params.get('gamma', 1))
     #env
     self.train_py_env = GenericEnv(action_specification, observation_specification, initial_state)
@@ -60,9 +60,9 @@ class GenericTfAgent(ABC):
   def get_train_action(self):
     time_step = self.env.current_time_step()
     if random.uniform(0, 1) < self.epsilon:
-      action = self.tf_agent.policy.action(time_step)
-    else:
       action = self.random_policy.action(time_step)
+    else:
+      action = self.tf_agent.policy.action(time_step)
     self.epsilon *= self.epsilon_decay
     #print('epsioln ', self.epsilon)
     return action

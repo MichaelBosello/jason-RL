@@ -27,11 +27,11 @@ class Env(Resource):
       print(json_data)
       if json_data['a_type'] == "int":
         a_type = np.int32
-      if json_data['a_type'] == "float":
+      if json_data['a_type'] == "float" or json_data['a_type'] == "double":
         a_type = np.float
       if json_data['o_type'] == "int":
         o_type = np.int32
-      if json_data['o_type'] == "float":
+      if json_data['o_type'] == "float" or json_data['o_type'] == "double":
         o_type = np.float
       if json_data['agent_type'] == "dqn":
         agent = DqnAgent(

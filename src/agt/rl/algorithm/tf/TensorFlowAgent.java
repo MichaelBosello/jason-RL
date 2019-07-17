@@ -43,6 +43,8 @@ public abstract class TensorFlowAgent implements AlgorithmRL{
 	
 	private Client client = ClientBuilder.newClient();
 	
+	private double preActionReward = 0;
+	
 	public TensorFlowAgent(String goal) {
 		super();
 		this.goal = goal;
@@ -61,13 +63,15 @@ public abstract class TensorFlowAgent implements AlgorithmRL{
 			}
 		}
 		
-		List<Float> currentState = observationsToTF(currentObservation);
+		List<Double> currentState = observationsToTF(currentObservation);
 		
-        StateRest<Float> state = new StateRest<>();
+        StateRest<Double> state = new StateRest<>();
         state.setState(currentState);
-        state.setState_type("float");
-        state.setReward(reward);
+        state.setState_type("double");
+        state.setReward(preActionReward);
         state.setIs_terminal(isTerminal);
+        
+        preActionReward = reward;
 
         Response response = client.target(TARGET + goal + policy)
                 .request(MediaType.APPLICATION_JSON)
@@ -87,7 +91,7 @@ public abstract class TensorFlowAgent implements AlgorithmRL{
 	@Override
 	public void initialize(Agent agent, BeliefBaseRL bb) {
 		
-		EnvironmentRest<Integer, Float> environment = new EnvironmentRest<>();
+		EnvironmentRest<Integer, Double> environment = new EnvironmentRest<>();
 		environment.setAgent_type(getMethod());
 		//actions specification
 		actions = Action.discretizeAction(PlanLibraryRL.getAllActionsForGoal(agent, goal));
@@ -112,25 +116,25 @@ public abstract class TensorFlowAgent implements AlgorithmRL{
 			observationsNameMap.put(o.getName(), o);
 		}
         
-		environment.setO_type("float");
+		environment.setO_type("double");
         List<Integer> o_shape = new ArrayList<>();
-    	List<Float> o_min = new ArrayList<>();
-    	List<Float> o_max = new ArrayList<>();
+    	List<Double> o_min = new ArrayList<>();
+    	List<Double> o_max = new ArrayList<>();
 		for(Observation observation : observations) {
 			if(observation.getParameters().size() == 0) {
-				o_min.add(0f);
-    			o_max.add(1f);
+				o_min.add(0.0);
+    			o_max.add(1.0);
 			} else
         	for(ObservationParameter param : observation.getParameters()) {
         		if(param.getType() == Observation.ParameterType.REAL) {
-        			o_min.add((float) param.getMin());
-        			o_max.add((float) param.getMax());
+        			o_min.add((double) param.getMin());
+        			o_max.add((double) param.getMax());
         		} else if(param.getType() == Observation.ParameterType.INT) {
-        			o_min.add((float) param.getMin());
-        			o_max.add((float) param.getMax());
+        			o_min.add((double) param.getMin());
+        			o_max.add((double) param.getMax());
         		} else if(param.getType() == Observation.ParameterType.SET) {
-        			o_min.add(0.0f);
-        			o_max.add((float) param.getSet().size() - 1);
+        			o_min.add(0.0);
+        			o_max.add((double) param.getSet().size() - 1);
         		}
         	}
     	}
@@ -157,7 +161,7 @@ public abstract class TensorFlowAgent implements AlgorithmRL{
 		
 	}
 	
-	protected List<Float> observationsToTF(Set<Literal> observationsLiteral){
+	protected List<Double> observationsToTF(Set<Literal> observationsLiteral){
 		List<Observation> currentGround = new ArrayList<>();
 		for(Term observation : observationsLiteral) {
 			String observationName = ((Literal) observation).getFunctor();
@@ -167,22 +171,22 @@ public abstract class TensorFlowAgent implements AlgorithmRL{
 				currentGround.add(o);
 			}
 		}
-        List<Float> stateTF = new ArrayList<>();
+        List<Double> stateTF = new ArrayList<>();
         for(Observation observation : observations) {
         	if(observation.getParameters().size() == 0) {
         		if(currentGround.contains(observation)){
-        			stateTF.add(1f);
+        			stateTF.add(1.0);
         		} else {
-        			stateTF.add(0f);
+        			stateTF.add(0.0);
         		}
 			} else
         	for(ObservationParameter param : observation.getParameters()) {
         		if(param.getType() == Observation.ParameterType.REAL) {
-        			stateTF.add(Float.parseFloat(param.getValue()));
+        			stateTF.add(Double.parseDouble(param.getValue()));
         		} else if(param.getType() == Observation.ParameterType.INT) {
-        			stateTF.add(Float.parseFloat(param.getValue()));
+        			stateTF.add(Double.parseDouble(param.getValue()));
         		} else if(param.getType() == Observation.ParameterType.SET) {
-        			stateTF.add((float) param.getSet().indexOf(param.getValue()));
+        			stateTF.add((double) param.getSet().indexOf(param.getValue()));
         		}
         	}
         }
