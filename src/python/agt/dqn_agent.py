@@ -26,7 +26,7 @@ class DqnAgent(GenericTfAgent):
       self.dataset = self.replay_buffer.as_dataset(
         num_parallel_calls=3, sample_batch_size=self.batch_size, num_steps=2).prefetch(3)
       self.iterator = iter(self.dataset)
-    elif self.init_steps > self.initial_collect_steps - 1:
+    elif self.init_steps >= self.initial_collect_steps:
       if self.episode_steps >= self.collect_steps_per_iteration - 1:
         experience, unused_info = next(self.iterator)
         train_loss = self.tf_agent.train(experience)
@@ -37,9 +37,9 @@ class DqnAgent(GenericTfAgent):
     if self.init_steps <= self.initial_collect_steps:
       self.init_steps = self.init_steps + 1
 
-    def get_train_action(self):
-      time_step = self.env.current_time_step()
-      if self.init_steps < self.initial_collect_steps:
-        return self.random_policy.action(time_step)
-      else:
-        return super(DqnAgent, self).get_train_action()
+  def get_train_action(self):
+    time_step = self.env.current_time_step()
+    if self.init_steps < self.initial_collect_steps:
+      return self.random_policy.action(time_step)
+    else:
+      return super(DqnAgent, self).get_train_action()
