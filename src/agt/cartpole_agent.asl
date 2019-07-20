@@ -6,6 +6,8 @@ rl_parameter(epsilon, 0.1).
 rl_parameter(epsilon_decay, 1).
 rl_parameter(batch_size, 64).
 rl_parameter(fc_layer_params, '(100, )').
+rl_parameter(initial_collect_steps, 1000).
+rl_parameter(collect_steps_per_iteration, 1).
 
 rl_observe(cartpole, cart_position(real(-4.8000002, 4.8000002))).
 rl_observe(cartpole, cart_velocity(real(-340282350000000000000000000000000000000, 340282350000000000000000000000000000000))).
