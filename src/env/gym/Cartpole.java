@@ -20,7 +20,7 @@ public class Cartpole extends Artifact{
 	
 	GymRest<Double> cartpole = new GymRest<>();
 	
-	private EpisodicLogger logger = new EpisodicLogger(true);
+	private EpisodicLogger logger = new EpisodicLogger("CartPole-v0", true, 5);;
 	private int trainEpisodeCount = 0;
 	private int episodeReward = 0;
 	private int episodeEvaluation = 0;
