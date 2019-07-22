@@ -22,9 +22,6 @@ class GenericTfAgent(ABC):
     #params
     self.replay_buffer_capacity = int(params.get('replay_buffer_capacity', 100000))
     self.fc_layer_params = ast.literal_eval(params.get('fc_layer_params', '(100, )'))
-    self.initial_collect_steps = int(params.get('initial_collect_steps', 1000))
-    self.collect_steps_per_iteration = int(params.get('collect_steps_per_iteration', 1))
-    self.batch_size = int(params.get('batch_size', 64))
     self.learning_rate = float(params.get('learning_rate', 1e-3))
     self.epsilon = float(params.get('epsilon', 0.1))
     self.epsilon_decay = float(params.get('epsilon_decay', 1))
@@ -56,7 +53,7 @@ class GenericTfAgent(ABC):
     traj = trajectory.from_transition(time_step, action_step, next_time_step)
     self.replay_buffer.add_batch(traj)
     self.update_network(traj)
-    
+
   def get_train_action(self):
     time_step = self.env.current_time_step()
     if random.uniform(0, 1) < self.epsilon:

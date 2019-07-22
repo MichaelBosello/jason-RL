@@ -4,6 +4,14 @@ from tf_agents.networks import q_network
 from generic_tf_agent import GenericTfAgent
 
 class DqnAgent(GenericTfAgent):
+  def __init__(self, action_specification, observation_specification, initial_state, params={}):
+    #params
+    self.initial_collect_steps = int(params.get('initial_collect_steps', 1000))
+    self.collect_steps_per_iteration = int(params.get('collect_steps_per_iteration', 1))
+    self.batch_size = int(params.get('batch_size', 64))
+
+    super(DqnAgent, self).__init__(action_specification, observation_specification, initial_state, params)
+
   def create_agent(self):
     q_net = q_network.QNetwork(
         self.env.observation_spec(),
