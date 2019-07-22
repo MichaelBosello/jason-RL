@@ -8,7 +8,7 @@ import cartago.OPERATION;
 import cartago.ObsProperty;
 import gym.rest.GymRest;
 import gym.rest.StateRest;
-import simulation.EpisodicSimulation;
+import simulation.EpisodicLogger;
 
 import jason.asSyntax.Atom;
 
@@ -20,7 +20,7 @@ public class MountainCar extends Artifact{
 	
 	GymRest<Double> mountainCar = new GymRest<>();
 	
-	private EpisodicSimulation logger = new EpisodicSimulation(true);
+	private EpisodicLogger logger = new EpisodicLogger(true);
 	private int trainEpisodeCount = 0;
 	private int episodeReward = 0;
 	private int episodeEvaluation = 0;

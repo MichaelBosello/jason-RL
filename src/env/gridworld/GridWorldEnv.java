@@ -13,7 +13,7 @@ import cartago.Artifact;
 import cartago.OPERATION;
 import cartago.ObsProperty;
 
-import simulation.EpisodicSimulation;
+import simulation.EpisodicLogger;
 
 public class GridWorldEnv extends Artifact {
 
@@ -27,7 +27,7 @@ public class GridWorldEnv extends Artifact {
 	Location finishline = new Location(GRID_SIZE - 1, GRID_SIZE - 1);
 
 	//to track the performance
-	private EpisodicSimulation simulation = new EpisodicSimulation();
+	private EpisodicLogger simulation = new EpisodicLogger();
 	private int movesDone = 0;
 	private int minNumberOfMoves;
 

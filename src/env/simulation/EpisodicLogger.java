@@ -4,17 +4,18 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
-public class EpisodicSimulation {
+public class EpisodicLogger {
 
 	private int episodes = 0;
 	private int episodesValue = 0;
 	private double averageValue = 0;
 
 	private final boolean saveResult;
-	private final static int SAVE_RESULT_AT = 6000;
+	private final int saveResultAt;
 	PrintWriter simultationResultsWriter;
 
-	public EpisodicSimulation(String filename, boolean saveResult) {
+	public EpisodicLogger(String filename, boolean saveResult, int saveResultAt) {
+		this.saveResultAt = saveResultAt;
 		this.saveResult = saveResult;
 		if (saveResult) {
 			try {
@@ -27,11 +28,15 @@ public class EpisodicSimulation {
 		}
 	}
 	
-	public EpisodicSimulation(boolean saveResult) {
-		this("simulation.txt", saveResult);
+	public EpisodicLogger(boolean saveResult, int saveResultAt) {
+		this("simulation.txt", saveResult, saveResultAt);
 	}
 	
-	public EpisodicSimulation() {
+	public EpisodicLogger(boolean saveResult) {
+		this(saveResult, 1000);
+	}
+	
+	public EpisodicLogger() {
 		this(false);
 	}
 
@@ -46,9 +51,9 @@ public class EpisodicSimulation {
 				" - average value last 100 ep: " + averageValue);
 
 		if (saveResult) {
-			if (episodes <= SAVE_RESULT_AT) {
+			if (episodes <= saveResultAt) {
 				simultationResultsWriter.println(value);
-			} else if (episodes == SAVE_RESULT_AT + 1) {
+			} else if (episodes == saveResultAt + 1) {
 				simultationResultsWriter.close();
 			}
 		}
