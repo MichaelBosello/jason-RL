@@ -101,7 +101,7 @@ public class MotivationalRule {
 
 								if (goalValue != null && rewardValue != null) {
 									if (goalValue.equals(goal)) {
-										totalReward += Integer.parseInt(rewardValue);
+										totalReward += Double.parseDouble(rewardValue);
 									}
 								}
 								if (goalVar != null) {
