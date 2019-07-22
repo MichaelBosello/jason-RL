@@ -25,7 +25,7 @@ To run the agent system:
 
 	./gradlew run
 
-If you use an algorithm implemented in python, you must run the python server _before_ the agent system
+If you use an algorithm implemented in python, you must run the python agent server _before_ the agent system
 *Check the dependencies below*
 You can run the python service with the apposite gradle task:
 
@@ -36,12 +36,24 @@ _or_ with the python command (from the directory src/python/agt):
 
 	python3 tf_agent_rest.py
 
+
+If you use an environment implemented in python, you must run the python environment server _before_ the agent system
+*Check the dependencies below*
+You can run the python service with the apposite gradle task:
+
+	./gradlew --stop
+	./gradlew runPythonEnvironment
+
+_or_ with the python command (from the directory src/python/env):
+
+	python3 tf_env_rest.py
+
 ## Python dependencies
 You must install python 3 (System tested on version 3.7.3) along with the following dependencies:
 
 	pip3 install tf-agents-nightly
 	pip3 install tensorflow==2.0.0-beta1
-	pip install 'gym==0.10.11'
+	pip3 install 'gym==0.10.11'
 	pip3 install IPython
 	pip3 install flask flask-jsonpify flask-restful
 # Configuration
