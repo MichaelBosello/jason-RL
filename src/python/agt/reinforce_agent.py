@@ -6,7 +6,6 @@ from generic_tf_agent import GenericTfAgent
 class ReinforceAgent(GenericTfAgent):
   def __init__(self, action_specification, observation_specification, initial_state, params={}):
     #params
-    self.initial_collect_steps = int(params.get('initial_collect_steps', 1000))
     self.collect_episodes_per_iteration = int(params.get('collect_episodes_per_iteration', 1))
     self.batch_size = int(params.get('batch_size', 64))
 
