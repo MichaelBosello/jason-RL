@@ -31,7 +31,7 @@ public class MotivationalRule {
 					if (litGoal.isGround() && litReward.isNumeric()) {
 						if (litGoal.toString().equals(goal)) {
 							try {
-								totalReward += ((NumberTerm) rw).solve();
+								totalReward += ((NumberTerm) litReward).solve();
 							} catch (NoValueException e) {}
 						}
 					}
