@@ -25,8 +25,11 @@ To run the agent system:
 
 	./gradlew run
 
+### Python algorithms 
 If you use an algorithm implemented in python, you must run the python agent server _before_ the agent system
+
 *Check the dependencies below*
+
 You can run the python service with the apposite gradle task:
 
 	./gradlew --stop
@@ -36,9 +39,11 @@ _or_ with the python command (from the directory src/python/agt):
 
 	python3 tf_agent_rest.py
 
-
+### Python environments 
 If you use an environment implemented in python, you must run the python environment server _before_ the agent system
+
 *Check the dependencies below*
+
 You can run the python service with the apposite gradle task:
 
 	./gradlew --stop
