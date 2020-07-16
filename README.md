@@ -3,7 +3,7 @@ This project is a PoC of the framework presented in
 
 ***From Programming Agents to Educating Agents – A Jason-based Framework for Integrating Learning in the Development of Cognitive Agents***
 
-Paper avaliable at: http://cgi.csc.liv.ac.uk/~lad/emas2019/accepted/EMAS2019_paper_33.pdf
+Paper avaliable at: https://link.springer.com/chapter/10.1007/978-3-030-51417-4_9 (short freely accessible version [here](https://cgi.csc.liv.ac.uk/~lad/emas2019/accepted/EMAS2019_paper_33.pdf))
 
 Slides of the presentation at EMAS: https://www.slideshare.net/MichaelBosello/emas-2019-from-programming-agents-to-educating-agents
 
@@ -16,9 +16,10 @@ In short, the aim of the framework is to enable the developer to define the lear
 
 The work of the developer moves from write plans to define a learning phase.
 
-As a reference example, we provide an agent and an environment for the GridWorld problem:
-+ The agent can move in four directions: right, left, up, down
-+ The agent must reach a target block doing the minimum number of steps
+As reference examples, we provide several agents and environments.
++ The Gridworld env and the SARSA algorithm are implemented in Java ex novo.
++ We implemented a RESTful service in Python that provides the capability of [TF-Agents](https://github.com/tensorflow/agents) to our framework. TF-Agents is a library that offers the core elements of RL and several RL algorithms, which is built on top of [TensorFlow](https://www.tensorflow.org/). A Java class that implements the interface requested by our framework consumes the above-mentioned service, completing the bridge between our framework and TF-Agents. We tested two algorithms offered by the library: DQN and REINFORCE.
++ We provide two classic control environments, namely CartPole and MountainCar. To obtain an ensemble of test tasks, we implemented a bridge – with a REST service, in the same way as for the algorithms – between the Jason environment and [Gym](https://github.com/openai/gym), a suite of RL tasks.
 
 # Quick start
 To run the agent system:
@@ -75,11 +76,5 @@ To load learning progress from a file: `loadProgress = true;`
 ## Gridworld configuration
 Show/hide the Gridworld GUI with the `SHOW_VIEW` boolean in `env/gridworld.GridWorldEnv`
 
-## Save simulation result
+## Save simulation results
 To log errors did in each episodes to a file change the boolean `SAVE_RESULT` in `env/simulation.EpisodicSimulation`
-
-
-
-
-# Note on the Belief Base implementation
-Originally, for performance purpose, the bb was tracking also the observations to keep from iteration of all the belief. Because of a problem with belif deletion, currently the bb is tracking only the *rl_observe* beliefs and the parameters, and it provide the observations through the bb iterable. To see the original implementation consult the differences in rl.beliefbase.BeliefBaserRL introduced with commit **86b23b7b6b8e1e73f2b88c823617d931b788ced5** at https://github.com/MichaelBosello/jacamo-rl/commit/86b23b7b6b8e1e73f2b88c823617d931b788ced5
