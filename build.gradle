@@ -61,14 +61,18 @@ task run (type: JavaExec, dependsOn: 'classes') {
 }
 
 task runPythonAgent(type:Exec) {
-   workingDir 'src/python/agt'
-   commandLine 'python3', 'tf_agent_rest.py'
-} 
+    group       ' Python'
+    description 'runs the python agent'
+    workingDir 'src/python/agt'
+    commandLine 'python3', 'tf_agent_rest.py'
+}
 
 task runPythonEnv(type:Exec) {
-   workingDir 'src/python/env'
-   commandLine 'python3', 'tf_env_rest.py'
-} 
+    group       ' Python'
+    description 'runs the python environment'
+    workingDir 'src/python/env'
+    commandLine 'python3', 'tf_env_rest.py'
+}
 
 task uberJar(type: Jar, dependsOn: 'classes') {
     group      ' JaCaMo'
