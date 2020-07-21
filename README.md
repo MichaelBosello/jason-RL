@@ -48,7 +48,7 @@ If you use an environment implemented in python, you must run the python environ
 You can run the python service with the apposite gradle task:
 
 	./gradlew --stop
-	./gradlew runPythonEnvironment
+	./gradlew runPythonEnv
 
 _or_ with the python command (from the directory src/python/env):
 
