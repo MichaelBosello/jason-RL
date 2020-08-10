@@ -21,6 +21,32 @@ As reference examples, we provide several agents and environments.
 + We implemented a RESTful service in Python that provides the capability of [TF-Agents](https://github.com/tensorflow/agents) to our framework. TF-Agents is a library that offers the core elements of RL and several RL algorithms, which is built on top of [TensorFlow](https://www.tensorflow.org/). A Java class that implements the interface requested by our framework consumes the above-mentioned service, completing the bridge between our framework and TF-Agents. We tested two algorithms offered by the library: DQN and REINFORCE.
 + We provide two classic control environments, namely CartPole and MountainCar. To obtain an ensemble of test tasks, we implemented a bridge – with a REST service, in the same way as for the algorithms – between the Jason environment and [Gym](https://github.com/openai/gym), a suite of RL tasks.
 
+# Framework usage
+The description of the framework, and how to use it, is extensively explained in the paper (and in the slides).
+
+You can develop Jason agents and environments as usual, and use *"soft plans"* when necessary (along with the appropriate belief). The framework will handle the rest.
+
+If you want to implement your own RL algorithm, you must implement the interface *AlgorithmRL*, and add its instance in *BeliefBaseRL* (line 98 to 106)
+
+## Src content
+
++ **agt/rl** contains the framework:
+
+	*execute, expected_return* two internal actions used to call softplans and check their expected return
+
+	*component/* contains the abstractions of the framework
+
+	*beliefbase/* the engine of the framework
+
++ **agt/rl/algorithm** contains the RL algorithm interface and proposed examples (the *tf* subdir contains the interface to the REST APIs of python algorithms)
++ **agt/*.asl** the agent examples
+
++ **env/** contains environment examples (*simulation* subdir contains common utilities. *gym* subdir contains the interface to the REST APIs of python envs)
+
++ **python/agt** implementation of REST APIs exposing tf-agents RL algorithms
+
++ **python/env** implementation of REST APIs exposing gym RL envs
+
 # Quick start
 To run the agent system:
 
@@ -64,7 +90,7 @@ You must install python 3 (System tested on version 3.7.3) along with the follow
 	pip3 install flask flask-jsonpify flask-restful
 # Configuration
 ## Algorithm Parameters
-You can change the parameters with the agent beliefs.
+You can change the parameters and the rl algorithm (dqn, sarsa, reinforce) with the agent beliefs.
 
 ## Serialization
 From `agt/rl.algorithm.BehaviourSerializer`:
