@@ -33,8 +33,8 @@ public class PlanLibraryRL {
 				for(Term annotationGoal : plan.getLabel().getAnnot(GOAL_FUNCTOR).getTerms()) {
 					//proceed if plan is for goal and is suitable in current context
 					if(annotationGoal.toString().equals(goal) &&
-					   plan.getContext() == null ||
-					   plan.getContext().logicalConsequence(transitionSystem.getAg(), unifier).hasNext()) {
+						(plan.getContext() == null ||
+						plan.getContext().logicalConsequence(transitionSystem.getAg(), unifier).hasNext())) {
 						
 						String planName = plan.getTrigger().getLiteral().toString();
 						List<ActionParameter> parameters = new ArrayList<>();
