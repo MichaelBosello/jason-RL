@@ -68,7 +68,11 @@ public class execute extends DefaultInternalAction {
 		//add the plan on top of current intention
 		Intention currentIntention = transitionSystem.getC().getSelectedIntention();
 		IntendedMeans currentMeans = currentIntention.pop();
-		rlPlanBody.add(currentMeans.getCurrentStep());
+		PlanBody currentPlan = currentMeans.getCurrentStep().clonePB();
+        if(currentPlan.getPlanSize() > 1) {
+            currentPlan.removeBody(0);
+            rlPlanBody.add(currentPlan);
+        }
 		currentMeans.insertAsNextStep(rlPlanBody);
 		currentIntention.push(currentMeans);
 		
