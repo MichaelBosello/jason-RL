@@ -1,11 +1,33 @@
 # BDI-RL Framework Proof of Concept
+
 This project is a PoC of the framework presented in 
 
 ***From Programming Agents to Educating Agents – A Jason-based Framework for Integrating Learning in the Development of Cognitive Agents***
+[[DOI](https://doi.org/10.1007/978-3-030-51417-4_9)]
+[[pre-print (free access)](https://cgi.csc.liv.ac.uk/~lad/emas2019/accepted/EMAS2019_paper_33.pdf)]
+[[talk slides](https://www.slideshare.net/MichaelBosello/emas-2019-from-programming-agents-to-educating-agents)]
 
-Paper avaliable at: https://link.springer.com/chapter/10.1007/978-3-030-51417-4_9 (short freely accessible version [here](https://cgi.csc.liv.ac.uk/~lad/emas2019/accepted/EMAS2019_paper_33.pdf))
+Michael Bosello, Alessandro Ricci.
 
-Slides of the presentation at EMAS: https://www.slideshare.net/MichaelBosello/emas-2019-from-programming-agents-to-educating-agents
+If you use this repo, please cite our *EMAS'19* paper.
+
+```
+@InProceedings{10.1007/978-3-030-51417-4_9,
+author="Bosello, Michael
+and Ricci, Alessandro",
+editor="Dennis, Louise A.
+and Bordini, Rafael H.
+and Lesp{\'e}rance, Yves",
+title="From Programming Agents to Educating Agents -- A Jason-Based Framework for Integrating Learning in the Development of Cognitive Agents",
+booktitle="Engineering Multi-Agent Systems",
+year="2020",
+publisher="Springer International Publishing",
+address="Cham",
+pages="175--194"
+}
+```
+
+___
 
 This is an integration of BDI agents and Reinforcement Learning.
 It is based on [Jason](http://jason.sourceforge.net/wp/) (Actually, it is a [JaCaMo](http://jacamo.sourceforge.net/) project).
