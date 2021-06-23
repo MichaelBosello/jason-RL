@@ -14,14 +14,14 @@
 
 mas jacamoRL {
 
-    agent rlagent : cartpole_agent.asl {
+    agent rlagent : gridworld_agent.asl {
     	ag-bb-class: rl.beliefbase.BeliefBaseRL	
-    	focus: cartpole.cp
+    	focus: gridworld.cp
     	verbose: 0
     }
     
-    workspace cartpole {
-        artifact cp: gym.Cartpole()
+    workspace gridworld {
+        artifact cp: gridworld.GridWorldEnv()
     }
 
 }
