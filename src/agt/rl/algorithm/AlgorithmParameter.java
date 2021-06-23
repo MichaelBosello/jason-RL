@@ -13,7 +13,7 @@ public class AlgorithmParameter {
 	private static final String EPSILON_DECAY_TERM = "epsilon_decay";
 	private static final String EPSILON_MIN_TERM = "epsilon_min";
 	private static final String POLICY_TERM = "policy";
-	public static final String ONLY_EXPLOIT_POLICY = "exploit_only";
+	public static final String ONLY_EXPLOIT_POLICY = "greedy";
 	public static final String EGREEDY_POLICY = "egreedy";
 	
 	private double alpha = 0.5;
@@ -56,9 +56,7 @@ public class AlgorithmParameter {
 			String parameterValue = parameter.getValue().toString();
 			
 			if(parameterKey.equals(POLICY_TERM)) {
-				if(parameterValue.equals(ONLY_EXPLOIT_POLICY) || parameterValue.equals(EGREEDY_POLICY)) {
-					policy = parameterValue;
-				}
+				policy = parameterValue;
 			} else {
 				if(parameterKey.equals(EPSILON_TERM) && parameterValue.equals("1/t")) {
 					dynamicEpsilon = true;
@@ -67,7 +65,7 @@ public class AlgorithmParameter {
 					try {
 						 value = Double.parseDouble(parameterValue);
 					} catch(Exception e) {}
-					if(value > 0) {
+					if(value >= 0) {
 						if(parameterKey.equals(ALPHA_TERM)) {
 							alpha = value;
 						} else if(parameterKey.equals(GAMMA_TERM)) {
