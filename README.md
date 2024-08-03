@@ -4,8 +4,8 @@ This project is a PoC of the framework presented in
 
 ***From Programming Agents to Educating Agents – A Jason-based Framework for Integrating Learning in the Development of Cognitive Agents***
 [[DOI](https://doi.org/10.1007/978-3-030-51417-4_9)]
-[[pre-print (free access)](https://cgi.csc.liv.ac.uk/~lad/emas2019/accepted/EMAS2019_paper_33.pdf)]
-[[talk slides](https://www.slideshare.net/MichaelBosello/emas-2019-from-programming-agents-to-educating-agents)]
+[[Pre-print](https://cgi.csc.liv.ac.uk/~lad/emas2019/accepted/EMAS2019_paper_33.pdf)]
+[[Slides](https://michaelbosello.github.io/uploads/slides/presentations/EMAS2019-slide.pdf)]
 
 Michael Bosello, Alessandro Ricci.
 
